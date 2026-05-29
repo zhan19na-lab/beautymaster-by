@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "name": "beautymaster-by",
+  "public": true,
+  "builds": [
+    { "src": "src/**", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/(.*)", "dest": "/src/$1" }
+  ]
+}
