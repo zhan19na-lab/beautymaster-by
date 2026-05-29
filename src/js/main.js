@@ -149,10 +149,9 @@
     const name    = document.getElementById('reg-name').value.trim();
     const dir     = document.getElementById('reg-direction').value;
     const contact = document.getElementById('reg-contact').value.trim();
+    const tg      = document.getElementById('reg-tg')?.value.trim() || '';
 
-    // Simple validation
     if (!name || !dir || !contact) {
-      // Shake animation on empty fields
       [
         { id: 'reg-name',      val: name },
         { id: 'reg-direction', val: dir },
@@ -171,10 +170,10 @@
     btn.disabled = true;
     btn.innerHTML = '<span>Создаём страницу...</span>';
 
-    fetch('/api/notify', {
+    fetch('/api/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, direction: dir, contact })
+      body: JSON.stringify({ name, direction: dir, contact, tgUsername: tg })
     })
       .catch(() => {})
       .finally(() => {
