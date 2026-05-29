@@ -8,48 +8,28 @@ export default async function handler(req, res) {
 
   const { type, name, phone, service, date, time, message, masterUsername } = req.body || {};
 
-  const token      = process.env.TELEGRAM_BOT_TOKEN;
+  const token       = process.env.TELEGRAM_BOT_TOKEN;
   const adminChatId = process.env.TELEGRAM_CHAT_ID;
-  const redisUrl   = process.env.UPSTASH_REDIS_REST_URL;
-  const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
   if (!token) return res.status(500).json({ error: 'Bot not configured' });
 
-  // Find master's chat_id from Redis, fallback to admin
+  // Find master's chat_id from env vars, fallback to admin
   let targetChatId = adminChatId;
-  if (redisUrl && redisToken && masterUsername) {
-    const clean = masterUsername.replace('@', '').toLowerCase();
-    const r = await fetch(`${redisUrl}/get/chatid:${clean}`, {
-      headers: { Authorization: `Bearer ${redisToken}` }
-    }).catch(() => null);
-    if (r?.ok) {
-      const data = await r.json().catch(() => null);
-      if (data?.result) targetChatId = data.result;
-    }
+  if (masterUsername) {
+    const envKey = `MASTER_${masterUsername.replace('@','').toUpperCase().replace(/[^A-Z0-9]/g,'_')}`;
+    const masterChatId = process.env[envKey];
+    if (masterChatId) targetChatId = masterChatId;
   }
 
   if (!targetChatId) return res.status(500).json({ error: 'No recipient found' });
 
   let text = '';
   if (type === 'callback') {
-    text =
-      `📞 <b>Заказать звонок!</b>\n\n` +
-      `👤 <b>Имя:</b> ${name || '—'}\n` +
-      `📱 <b>Телефон:</b> ${phone || '—'}`;
+    text = `📞 <b>Заказать звонок!</b>\n\n👤 <b>Имя:</b> ${name||'—'}\n📱 <b>Телефон:</b> ${phone||'—'}`;
   } else if (type === 'booking') {
-    text =
-      `📅 <b>Новая запись!</b>\n\n` +
-      `👤 <b>Клиент:</b> ${name || '—'}\n` +
-      `📱 <b>Телефон:</b> ${phone || '—'}\n` +
-      `💅 <b>Услуга:</b> ${service || '—'}\n` +
-      `📆 <b>Дата:</b> ${date || '—'}\n` +
-      `🕐 <b>Время:</b> ${time || '—'}`;
+    text = `📅 <b>Новая запись!</b>\n\n👤 <b>Клиент:</b> ${name||'—'}\n📱 <b>Телефон:</b> ${phone||'—'}\n💅 <b>Услуга:</b> ${service||'—'}\n📆 <b>Дата:</b> ${date||'—'}\n🕐 <b>Время:</b> ${time||'—'}`;
   } else {
-    text =
-      `✉️ <b>Новое сообщение!</b>\n\n` +
-      `👤 <b>Имя:</b> ${name || '—'}\n` +
-      `📱 <b>Телефон:</b> ${phone || '—'}\n` +
-      `💬 <b>Сообщение:</b> ${message || '—'}`;
+    text = `✉️ <b>Новое сообщение!</b>\n\n👤 <b>Имя:</b> ${name||'—'}\n📱 <b>Телефон:</b> ${phone||'—'}\n💬 <b>Сообщение:</b> ${message||'—'}`;
   }
 
   try {
