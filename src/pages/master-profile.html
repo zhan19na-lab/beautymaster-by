@@ -483,6 +483,65 @@
     </div>
   </footer>
 
+  <!-- ░░ CONTACT FAB ░░ -->
+  <button class="contact-fab" id="contact-fab" aria-label="Связаться">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+    <span>Связаться</span>
+  </button>
+
+  <!-- ░░ CONTACT MODAL ░░ -->
+  <div class="contact-modal-overlay" id="contact-modal-overlay">
+    <div class="contact-modal" id="contact-modal">
+      <button class="contact-modal-close" id="contact-modal-close" aria-label="Закрыть">✕</button>
+
+      <!-- Tabs -->
+      <div class="contact-tabs">
+        <button class="contact-tab active" data-tab="order">✉️ Написать заявку</button>
+        <button class="contact-tab" data-tab="callback">📞 Заказать звонок</button>
+      </div>
+
+      <!-- Tab: Order -->
+      <div class="contact-tab-pane active" id="ctab-order">
+        <p class="contact-modal-hint">Опишите что хотите — мастер свяжется с вами в течение часа</p>
+        <form class="contact-form" id="contact-form-order" novalidate>
+          <div class="cform-group">
+            <input type="text" class="cform-input" id="co-name" placeholder="Ваше имя" />
+          </div>
+          <div class="cform-group">
+            <input type="tel" class="cform-input" id="co-phone" placeholder="+375 XX XXX-XX-XX" />
+          </div>
+          <div class="cform-group">
+            <textarea class="cform-input cform-textarea" id="co-message" placeholder="Услуга, пожелания..." rows="3"></textarea>
+          </div>
+          <button type="submit" class="cform-submit">Отправить заявку ✦</button>
+        </form>
+        <div class="cform-success" id="corder-success" style="display:none;">
+          <div class="cform-success-icon">✦</div>
+          <p>Заявка отправлена!<br/>Мастер свяжется с вами в течение часа.</p>
+        </div>
+      </div>
+
+      <!-- Tab: Callback -->
+      <div class="contact-tab-pane" id="ctab-callback">
+        <p class="contact-modal-hint">Оставьте номер — мастер перезвонит вам в ближайшее время</p>
+        <form class="contact-form" id="contact-form-callback" novalidate>
+          <div class="cform-group">
+            <input type="text" class="cform-input" id="cc-name" placeholder="Ваше имя" />
+          </div>
+          <div class="cform-group">
+            <input type="tel" class="cform-input" id="cc-phone" placeholder="+375 XX XXX-XX-XX" />
+          </div>
+          <button type="submit" class="cform-submit">Заказать звонок 📞</button>
+        </form>
+        <div class="cform-success" id="ccallback-success" style="display:none;">
+          <div class="cform-success-icon">✦</div>
+          <p>Принято!<br/>Мастер перезвонит вам в ближайшее время.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <!-- ░░ SHARE BUTTON ░░ -->
   <button class="share-fab" id="share-fab" aria-label="Поделиться страницей">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>

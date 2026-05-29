@@ -321,7 +321,7 @@ function shakeStep(step) {
 const bookingForm = document.getElementById('booking-form');
 const bookingSuccess = document.getElementById('booking-success');
 
-bookingForm?.addEventListener('submit', (e) => {
+bookingForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
   const name  = document.getElementById('b-name')?.value.trim();
   const phone = document.getElementById('b-phone')?.value.trim();
@@ -341,12 +341,23 @@ bookingForm?.addEventListener('submit', (e) => {
   btn.disabled = true;
   btn.textContent = 'Отправляем...';
 
-  setTimeout(() => {
-    document.querySelector('.booking-wrap').innerHTML = '';
-    bookingSuccess.style.display = 'flex';
-    document.querySelector('.booking-wrap').appendChild(bookingSuccess);
-    bookingSuccess.style.display = 'flex';
-  }, 1000);
+  await fetch('/api/booking', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      type: 'booking',
+      name,
+      phone,
+      service: window.__bookingService || '—',
+      date: window.__bookingDate || '—',
+      time: window.__bookingTime || '—'
+    })
+  }).catch(() => {});
+
+  document.querySelector('.booking-wrap').innerHTML = '';
+  bookingSuccess.style.display = 'flex';
+  document.querySelector('.booking-wrap').appendChild(bookingSuccess);
+  bookingSuccess.style.display = 'flex';
 });
 
 document.querySelectorAll('.bform-input').forEach(el => {
@@ -386,5 +397,80 @@ document.querySelectorAll('.bform-input').forEach(el => {
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') overlay?.classList.remove('open');
+  });
+})();
+
+/* ── Contact FAB + Modal ───────────────────────────────────── */
+(function initContactModal() {
+  const fab     = document.getElementById('contact-fab');
+  const overlay = document.getElementById('contact-modal-overlay');
+  const closeBtn = document.getElementById('contact-modal-close');
+
+  fab?.addEventListener('click', () => overlay?.classList.add('open'));
+  closeBtn?.addEventListener('click', () => overlay?.classList.remove('open'));
+  overlay?.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.classList.remove('open');
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') overlay?.classList.remove('open');
+  });
+
+  // Tabs
+  document.querySelectorAll('.contact-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.contact-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.contact-tab-pane').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(`ctab-${tab.dataset.tab}`)?.classList.add('active');
+    });
+  });
+
+  // Order form
+  document.getElementById('contact-form-order')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name    = document.getElementById('co-name').value.trim();
+    const phone   = document.getElementById('co-phone').value.trim();
+    const message = document.getElementById('co-message').value.trim();
+    if (!name || !phone) {
+      if (!name) document.getElementById('co-name').classList.add('input-error');
+      if (!phone) document.getElementById('co-phone').classList.add('input-error');
+      return;
+    }
+    const btn = e.target.querySelector('.cform-submit');
+    btn.disabled = true;
+    btn.textContent = 'Отправляем...';
+    await fetch('/api/booking', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'order', name, phone, message })
+    }).catch(() => {});
+    e.target.style.display = 'none';
+    document.getElementById('corder-success').style.display = 'flex';
+  });
+
+  // Callback form
+  document.getElementById('contact-form-callback')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name  = document.getElementById('cc-name').value.trim();
+    const phone = document.getElementById('cc-phone').value.trim();
+    if (!name || !phone) {
+      if (!name) document.getElementById('cc-name').classList.add('input-error');
+      if (!phone) document.getElementById('cc-phone').classList.add('input-error');
+      return;
+    }
+    const btn = e.target.querySelector('.cform-submit');
+    btn.disabled = true;
+    btn.textContent = 'Отправляем...';
+    await fetch('/api/booking', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'callback', name, phone })
+    }).catch(() => {});
+    e.target.style.display = 'none';
+    document.getElementById('ccallback-success').style.display = 'flex';
+  });
+
+  document.querySelectorAll('.cform-input').forEach(el => {
+    el.addEventListener('input', () => el.classList.remove('input-error'));
   });
 })();

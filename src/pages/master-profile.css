@@ -971,6 +971,156 @@ button { cursor: pointer; border: none; background: none; font: inherit; color: 
   line-height: 1.75;
 }
 
+/* ── CONTACT FAB ─────────────────────────────────────────── */
+.contact-fab {
+  position: fixed;
+  bottom: 28px;
+  right: 180px;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--gold);
+  color: #0A0A0A;
+  font-size: 0.78rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 12px 20px;
+  transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
+  box-shadow: 0 4px 24px rgba(201,169,110,0.35);
+}
+.contact-fab:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(201,169,110,0.45); }
+
+/* ── CONTACT MODAL ───────────────────────────────────────── */
+.contact-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(8px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s;
+  padding: 20px;
+}
+.contact-modal-overlay.open { opacity: 1; pointer-events: all; }
+.contact-modal {
+  background: var(--bg-card);
+  border: 1px solid var(--gold-border);
+  padding: clamp(24px, 5vw, 44px);
+  max-width: 440px;
+  width: 100%;
+  position: relative;
+  transform: translateY(24px) scale(0.97);
+  transition: transform 0.4s var(--ease-out);
+}
+.contact-modal-overlay.open .contact-modal { transform: none; }
+.contact-modal-close {
+  position: absolute;
+  top: 16px; right: 16px;
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--muted);
+  font-size: 0.9rem;
+  transition: color 0.25s;
+  border: 1px solid transparent;
+}
+.contact-modal-close:hover { color: var(--cream); border-color: var(--gold-border); }
+
+/* Tabs */
+.contact-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--gold-border);
+}
+.contact-tab {
+  flex: 1;
+  padding: 12px 8px;
+  font-size: 0.78rem;
+  font-family: var(--font-body);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.25s, border-color 0.25s;
+}
+.contact-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+.contact-tab:hover { color: var(--gold-light); }
+
+.contact-tab-pane { display: none; }
+.contact-tab-pane.active { display: block; }
+
+.contact-modal-hint {
+  font-size: 0.83rem;
+  color: var(--muted);
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+/* Form */
+.cform-group { margin-bottom: 14px; }
+.cform-input {
+  width: 100%;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--gold-border);
+  color: var(--cream);
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  padding: 12px 15px;
+  outline: none;
+  transition: border-color 0.25s;
+  appearance: none;
+}
+.cform-input:focus { border-color: var(--gold); }
+.cform-input::placeholder { color: var(--muted-2); }
+.cform-input.input-error { border-color: #c0392b; animation: shake 0.4s; }
+.cform-textarea { resize: none; }
+.cform-submit {
+  width: 100%;
+  background: var(--gold);
+  color: #0A0A0A;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 14px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  margin-top: 6px;
+}
+.cform-submit:hover { background: var(--gold-light); transform: translateY(-1px); }
+.cform-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+/* Success state */
+.cform-success {
+  text-align: center;
+  padding: 32px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.cform-success-icon {
+  font-size: 2.4rem;
+  color: var(--gold);
+  animation: successSpin 3s linear infinite;
+}
+.cform-success p {
+  font-size: 0.95rem;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
 /* ── Animations ──────────────────────────────────────────── */
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
