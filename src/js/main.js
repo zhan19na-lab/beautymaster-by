@@ -167,15 +167,20 @@
       return;
     }
 
-    // Simulate submit
     const btn = form.querySelector('button[type="submit"]');
     btn.disabled = true;
     btn.innerHTML = '<span>Создаём страницу...</span>';
 
-    setTimeout(() => {
-      form.style.display = 'none';
-      success.style.display = 'flex';
-    }, 1200);
+    fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, direction: dir, contact })
+    })
+      .catch(() => {})
+      .finally(() => {
+        form.style.display = 'none';
+        success.style.display = 'flex';
+      });
   });
 })();
 
