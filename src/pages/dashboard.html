@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Кабинет мастера — BeautyMaster.by</title>
+  <meta name="robots" content="noindex" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+<body>
+
+  <!-- ░░ SIDEBAR ░░ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <a href="../index.html">BEAUTY<span>MASTER</span></a>
+    </div>
+
+    <div class="sidebar-profile">
+      <div class="sidebar-avatar" id="sb-avatar">АК</div>
+      <div class="sidebar-name" id="sb-name">Анастасия Коваль</div>
+      <div class="sidebar-spec" id="sb-spec">💅 Маникюр / Педикюр</div>
+      <div class="trial-badge" id="trial-badge">
+        <span class="trial-dot"></span>
+        Триал: <strong id="trial-days">14</strong> дней
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="#profile"   class="snav-item active" data-section="profile">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.58-7 8-7s8 3 8 7"/></svg>
+        Профиль
+      </a>
+      <a href="#services"  class="snav-item" data-section="services">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        Услуги и цены
+      </a>
+      <a href="#schedule"  class="snav-item" data-section="schedule">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Расписание
+      </a>
+      <a href="#portfolio" class="snav-item" data-section="portfolio">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Портфолио
+      </a>
+      <a href="#preview" class="snav-item snav-item--preview" data-section="preview" target="_blank">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        Моя страница
+        <svg class="ext-icon" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 2H2a1 1 0 00-1 1v7a1 1 0 001 1h7a1 1 0 001-1V8M7 1h4v4M5 7l6-6"/></svg>
+      </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <button class="save-all-btn" id="save-all-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Сохранить всё
+      </button>
+    </div>
+  </aside>
+
+  <!-- ░░ MOBILE TOP BAR ░░ -->
+  <div class="mobile-topbar">
+    <button class="mobile-burger" id="mobile-burger">
+      <span></span><span></span><span></span>
+    </button>
+    <span class="mobile-logo">BEAUTYMASTER.BY</span>
+    <a href="master-profile.html" target="_blank" class="mobile-preview-btn">Моя страница →</a>
+  </div>
+
+  <!-- ░░ MAIN ░░ -->
+  <main class="dash-main">
+
+    <!-- ════════════════════════════════
+         SECTION: PROFILE
+    ════════════════════════════════ -->
+    <section class="dash-section active" id="section-profile">
+      <div class="dash-section-header">
+        <h1 class="dash-title">Мой профиль</h1>
+        <p class="dash-subtitle">Эту информацию видят ваши клиенты</p>
+      </div>
+
+      <div class="dash-grid">
+
+        <!-- Avatar card -->
+        <div class="dash-card avatar-card">
+          <h3 class="card-title">Фото профиля</h3>
+          <div class="avatar-upload-area" id="avatar-upload-area">
+            <div class="avatar-preview" id="avatar-preview">АК</div>
+            <div class="avatar-upload-overlay">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span>Загрузить фото</span>
+            </div>
+            <input type="file" id="avatar-input" accept="image/*" style="display:none" />
+          </div>
+          <p class="avatar-hint">JPG, PNG · до 5 МБ · Рекомендуется квадратное фото</p>
+        </div>
+
+        <!-- Basic info card -->
+        <div class="dash-card info-card">
+          <h3 class="card-title">Основная информация</h3>
+          <div class="form-group">
+            <label class="form-label">Имя мастера</label>
+            <input type="text" class="form-input" id="p-name" value="Анастасия Коваль" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Направление</label>
+            <select class="form-input form-select" id="p-direction">
+              <option value="Маникюр / Педикюр" selected>💅 Маникюр / Педикюр</option>
+              <option value="Ресницы">👁️ Ресницы</option>
+              <option value="Брови">🤨 Брови</option>
+              <option value="Волосы">💇 Волосы</option>
+              <option value="Косметология">💆 Косметология</option>
+              <option value="Визаж">💋 Визаж / Макияж</option>
+              <option value="Массаж / СПА">🧖 Массаж / СПА</option>
+              <option value="Тату / ПМ">🖋️ Тату / Перм. макияж</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Город и адрес</label>
+            <input type="text" class="form-input" id="p-location" value="Минск · Принимаю на дому" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Телефон</label>
+              <input type="tel" class="form-input" id="p-phone" value="+375 29 123-45-67" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Instagram</label>
+              <input type="text" class="form-input" id="p-instagram" placeholder="@username" />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">TikTok</label>
+              <input type="text" class="form-input" id="p-tiktok" placeholder="@username" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">WhatsApp</label>
+              <input type="text" class="form-input" id="p-whatsapp" placeholder="+375 XX XXX-XX-XX" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Bio card -->
+        <div class="dash-card bio-card">
+          <div class="card-title-row">
+            <h3 class="card-title">О себе</h3>
+            <button class="ai-btn" id="ai-bio-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              AI-помощник
+            </button>
+          </div>
+          <textarea class="form-input form-textarea" id="p-bio" rows="5">Более 5 лет я создаю идеальный маникюр для тех, кто ценит детали. Работаю только с премиальными материалами. Каждая клиентка уходит с улыбкой — и с ногтями, которыми хочется делиться в Instagram.</textarea>
+          <p class="char-count"><span id="bio-count">196</span> / 400 символов</p>
+
+          <!-- AI panel -->
+          <div class="ai-panel" id="ai-panel" style="display:none;">
+            <div class="ai-panel-header">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              AI-помощник
+            </div>
+            <p class="ai-panel-hint">Расскажи кратко о себе — AI напишет красивый текст</p>
+            <textarea class="form-input form-textarea ai-textarea" id="ai-prompt" rows="3" placeholder="Напр: 5 лет опыта, специализируюсь на дизайне, люблю необычные идеи..."></textarea>
+            <button class="ai-generate-btn" id="ai-generate-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              Сгенерировать
+            </button>
+            <div class="ai-result" id="ai-result" style="display:none;">
+              <p id="ai-result-text"></p>
+              <div class="ai-result-actions">
+                <button class="ai-accept-btn" id="ai-accept-btn">Использовать этот текст</button>
+                <button class="ai-retry-btn" id="ai-retry-btn">Попробовать ещё раз</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top:16px;">
+            <label class="form-label">Слоган (одна строка под именем)</label>
+            <input type="text" class="form-input" id="p-tagline" placeholder="Напр: Ваши ногти — моё искусство" />
+          </div>
+
+          <button class="save-btn" onclick="saveSection('profile')">Сохранить профиль</button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════
+         SECTION: SERVICES
+    ════════════════════════════════ -->
+    <section class="dash-section" id="section-services">
+      <div class="dash-section-header">
+        <h1 class="dash-title">Услуги и цены</h1>
+        <p class="dash-subtitle">Клиенты видят этот список при записи</p>
+      </div>
+
+      <div class="dash-card">
+        <div class="services-editor" id="services-editor">
+          <!-- Services rendered by JS -->
+        </div>
+        <button class="add-service-btn" id="add-service-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Добавить услугу
+        </button>
+        <div class="services-footer">
+          <button class="save-btn" onclick="saveSection('services')">Сохранить услуги</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════
+         SECTION: SCHEDULE
+    ════════════════════════════════ -->
+    <section class="dash-section" id="section-schedule">
+      <div class="dash-section-header">
+        <h1 class="dash-title">Расписание работы</h1>
+        <p class="dash-subtitle">Клиенты видят только свободные слоты</p>
+      </div>
+
+      <div class="dash-grid schedule-grid">
+        <!-- Weekly hours -->
+        <div class="dash-card">
+          <h3 class="card-title">Рабочие дни и часы</h3>
+          <div class="schedule-days" id="schedule-days">
+            <!-- Rendered by JS -->
+          </div>
+          <button class="save-btn" onclick="saveSection('schedule')">Сохранить расписание</button>
+        </div>
+
+        <!-- Break / interval -->
+        <div class="dash-card">
+          <h3 class="card-title">Длительность и перерывы</h3>
+          <div class="form-group">
+            <label class="form-label">Длительность одного слота</label>
+            <select class="form-input form-select" id="slot-duration">
+              <option value="30">30 минут</option>
+              <option value="60" selected>1 час</option>
+              <option value="90">1.5 часа</option>
+              <option value="120">2 часа</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Перерыв между клиентами</label>
+            <select class="form-input form-select" id="slot-break">
+              <option value="0">Без перерыва</option>
+              <option value="15" selected>15 минут</option>
+              <option value="30">30 минут</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Предупреждение о записи (заранее)</label>
+            <select class="form-input form-select" id="advance-notice">
+              <option value="0">В любое время</option>
+              <option value="2">Минимум 2 часа</option>
+              <option value="24" selected>Минимум 1 день</option>
+              <option value="48">Минимум 2 дня</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Ваша ссылка для клиентов</label>
+            <div class="link-copy-wrap">
+              <input type="text" class="form-input link-input" id="master-link" value="beautymaster.by/anastasia-koval" readonly />
+              <button class="link-copy-btn" id="link-copy-btn">Копировать</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ════════════════════════════════
+         SECTION: PORTFOLIO
+    ════════════════════════════════ -->
+    <section class="dash-section" id="section-portfolio">
+      <div class="dash-section-header">
+        <h1 class="dash-title">Портфолио</h1>
+        <p class="dash-subtitle">Фотографии ваших работ — главное что видят клиенты</p>
+      </div>
+
+      <div class="dash-card">
+        <div class="portfolio-upload-area" id="portfolio-upload-area">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <p>Перетащи фото сюда или <label for="portfolio-input" class="upload-link">выбери файлы</label></p>
+          <span>JPG, PNG · до 10 МБ каждый</span>
+          <input type="file" id="portfolio-input" accept="image/*" multiple style="display:none" />
+        </div>
+
+        <div class="portfolio-grid-editor" id="portfolio-grid-editor">
+          <!-- Demo items -->
+          <div class="portfolio-thumb" data-id="1">
+            <img src="https://images.unsplash.com/photo-1604654894610-df63bc536371?w=240&q=80&fit=crop" alt="" />
+            <div class="thumb-overlay">
+              <button class="thumb-edit-btn" title="Подпись">✎</button>
+              <button class="thumb-delete-btn" title="Удалить">✕</button>
+            </div>
+            <div class="thumb-caption-wrap">
+              <input type="text" class="thumb-caption" placeholder="Подпись (необязательно)" value="Гель-лак · Дизайн" />
+            </div>
+          </div>
+          <div class="portfolio-thumb" data-id="2">
+            <img src="https://images.unsplash.com/photo-1604655724490-a8cb4f80b3bb?w=240&q=80&fit=crop" alt="" />
+            <div class="thumb-overlay">
+              <button class="thumb-edit-btn" title="Подпись">✎</button>
+              <button class="thumb-delete-btn" title="Удалить">✕</button>
+            </div>
+            <div class="thumb-caption-wrap">
+              <input type="text" class="thumb-caption" placeholder="Подпись" value="Наращивание" />
+            </div>
+          </div>
+          <div class="portfolio-thumb" data-id="3">
+            <img src="https://images.unsplash.com/photo-1519014816548-bf5fe059798b?w=240&q=80&fit=crop" alt="" />
+            <div class="thumb-overlay">
+              <button class="thumb-edit-btn" title="Подпись">✎</button>
+              <button class="thumb-delete-btn" title="Удалить">✕</button>
+            </div>
+            <div class="thumb-caption-wrap">
+              <input type="text" class="thumb-caption" placeholder="Подпись" value="Педикюр" />
+            </div>
+          </div>
+          <div class="portfolio-thumb" data-id="4">
+            <img src="https://images.unsplash.com/photo-1610992015732-2449b76344bc?w=240&q=80&fit=crop" alt="" />
+            <div class="thumb-overlay">
+              <button class="thumb-edit-btn" title="Подпись">✎</button>
+              <button class="thumb-delete-btn" title="Удалить">✕</button>
+            </div>
+            <div class="thumb-caption-wrap">
+              <input type="text" class="thumb-caption" placeholder="Подпись" value="Маникюр" />
+            </div>
+          </div>
+        </div>
+        <p class="portfolio-hint">Перетащи карточки для изменения порядка · Максимум 20 фото</p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ░░ TOAST ░░ -->
+  <div class="toast" id="toast"></div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>

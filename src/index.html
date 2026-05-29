@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BeautyMaster.by — Платформа для мастеров высшего класса</title>
+  <meta name="description" content="Личная цифровая витрина для бьюти-мастеров Беларуси. Портфолио, онлайн-запись, AI-помощник. Старт бесплатно — 21 день." />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="BeautyMaster.by — Платформа для мастеров высшего класса" />
+  <meta property="og:description" content="Личная страница мастера, онлайн-запись клиентов, AI-тексты. Попробуй 21 день бесплатно." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://beautymaster.by" />
+  <meta property="og:image" content="https://beautymaster.by/og-image.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- PWA -->
+  <link rel="manifest" href="../manifest.json" />
+  <meta name="theme-color" content="#0A0A0A" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+
+  <!-- ░░ CANVAS PARTICLES ░░ -->
+  <canvas id="particles-canvas"></canvas>
+
+  <!-- ░░ NAV ░░ -->
+  <nav class="nav" id="nav">
+    <a href="#" class="nav-logo">BEAUTYMASTER<span>.BY</span></a>
+    <div class="nav-links">
+      <a href="#directions">Направления</a>
+      <a href="#how-it-works">Как работает</a>
+      <a href="#pricing">Цены</a>
+      <a href="pages/dashboard.html" class="nav-link-dash">Кабинет мастера</a>
+      <a href="#registration" class="nav-cta">Начать бесплатно</a>
+    </div>
+    <button class="nav-burger" id="nav-burger" aria-label="Меню">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- ░░ MOBILE MENU ░░ -->
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="#directions" class="mobile-link">Направления</a>
+    <a href="#how-it-works" class="mobile-link">Как работает</a>
+    <a href="#pricing" class="mobile-link">Цены</a>
+    <a href="#registration" class="mobile-link mobile-link--cta">Начать бесплатно</a>
+  </div>
+
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <!-- ░░ HERO ░░ -->
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <section class="hero" id="hero">
+    <div class="hero-inner">
+      <div class="hero-tag reveal">Беларусь · Бьюти-индустрия</div>
+      <h1 class="hero-title reveal reveal--delay-1">
+        Платформа для мастеров<br /><em>высшего класса</em>
+      </h1>
+      <p class="hero-sub reveal reveal--delay-2">
+        Выбери своё направление — и я сделаю под ключ именно для тебя
+      </p>
+      <div class="hero-actions reveal reveal--delay-3">
+        <a href="#registration" class="btn btn--gold">
+          <span>Получить свою страницу</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="pages/master-profile.html" class="btn btn--ghost" target="_blank">
+          Посмотреть демо страницу
+        </a>
+      </div>
+      <div class="hero-stats reveal reveal--delay-4">
+        <div class="hero-stat">
+          <span class="hero-stat-num">21</span>
+          <span class="hero-stat-label">день бесплатно</span>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div class="hero-stat">
+          <span class="hero-stat-num">8</span>
+          <span class="hero-stat-label">направлений</span>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div class="hero-stat">
+          <span class="hero-stat-num">∞</span>
+          <span class="hero-stat-label">записей от клиентов</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-scroll-hint">
+      <span>Прокрути вниз</span>
+      <div class="hero-scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <!-- ░░ DIRECTIONS ░░ -->
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <section class="section directions" id="directions">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">01 / Направления</span>
+        <h2 class="section-title">Твоё направление</h2>
+        <p class="section-sub">Каждый мастер получает страницу, созданную именно для его ниши</p>
+      </div>
+
+      <div class="directions-grid-new">
+
+        <div class="dir-card-new reveal" data-dir="Маникюр / Педикюр">
+          <img class="dir-bg" src="https://img.magnific.com/premium-photo/pedicure-beauty-feet-with-nail-polish-salon-wellness-foot-care-white-floor-aesthetic-cosmetics-toes-hands-with-manicure-french-tips-pamper-spa-beauty-treatment_590464-125306.jpg" alt="Маникюр" loading="lazy" />
+          <div class="dir-overlay"></div>
+          <div class="dir-default">
+            <h3 class="dir-name">Маникюр<br/>Педикюр</h3>
+            <span class="dir-hint">наведи, чтобы узнать больше</span>
+          </div>
+          <div class="dir-hover-content">
+            <h3 class="dir-hover-title">Маникюр / Педикюр</h3>
+            <ul class="dir-services-list">
+              <li>Классический маникюр</li><li>Аппаратный маникюр</li>
+              <li>Гель-лак покрытие</li><li>Наращивание ногтей</li>
+              <li>Педикюр классический</li><li>Педикюр аппаратный</li>
+              <li>Французский маникюр</li><li>Арт-дизайн ногтей</li>
+            </ul>
+            <a href="#registration" class="dir-cta-btn">Выбрать это направление →</a>
+          </div>
+        </div>
+
+        <div class="dir-card-new reveal reveal--delay-1" data-dir="Ресницы">
+          <img class="dir-bg" src="foto/istockphoto-845708412-612x612.jpg" alt="Ресницы" />
+          <div class="dir-overlay"></div>
+          <div class="dir-default">
+            <h3 class="dir-name">Ресницы</h3>
+            <span class="dir-hint">наведи, чтобы узнать больше</span>
+          </div>
+          <div class="dir-hover-content">
+            <h3 class="dir-hover-title">Наращивание ресниц</h3>
+            <ul class="dir-services-list">
+              <li>Наращивание 2D/3D</li><li>Объёмное наращивание</li>
+              <li>Классическое наращивание</li><li>Ламинирование ресниц</li>
+              <li>Окрашивание ресниц</li><li>Коррекция ресниц</li>
+              <li>Биозавивка ресниц</li><li>Снятие нарощенных</li>
+            </ul>
+            <a href="#registration" class="dir-cta-btn">Выбрать это направление →</a>
+          </div>
+        </div>
+
+        <div class="dir-card-new reveal reveal--delay-2" data-dir="Брови">
+          <img class="dir-bg" src="foto/istockphoto-1356234548-612x612.jpg" alt="Брови" />
+          <div class="dir-overlay"></div>
+          <div class="dir-default">
+            <h3 class="dir-name">Брови</h3>
+            <span class="dir-hint">наведи, чтобы узнать больше</span>
+          </div>
+          <div class="dir-hover-content">
+            <h3 class="dir-hover-title">Оформление бровей</h3>
+            <ul class="dir-services-list">
+              <li>Коррекция бровей</li><li>Окрашивание хной</li>
+              <li>Микроблейдинг</li><li>Перманентный макияж</li>
+              <li>Архитектура бровей</li><li>Ламинирование бровей</li>
+              <li>Оформление воском</li><li>Tatoo brow</li>
+            </ul>
+            <a href="#registration" class="dir-cta-btn">Выбрать это направление →</a>
+          </div>
+        </div>
+
+        <div class="dir-card-new reveal reveal--delay-3" data-dir="Волосы">
+          <img class="dir-bg" src="https://images.unsplash.com/photo-1560869713-7d0a29430803?w=700&q=85&fit=crop&crop=top" alt="Волосы" loading="lazy" />
+          <div class="dir-overlay"></div>
+          <div class="dir-default">
+            <h3 class="dir-name">Волосы</h3>
+            <span class="dir-hint">наведи, чтобы узнать больше</span>
+          </div>
+          <div class="dir-hover-content">
+            <h3 class="dir-hover-title">Парикмахерские услуги</h3>
+            <ul class="dir-services-list">
+              <li>Стрижка женская</li><li>Окрашивание волос</li>
+              <li>Мелирование</li><li>Кератиновое выпрямление</li>
+              <li>Наращивание волос</li><li>Ламинирование</li>
+              <li>Укладка / Причёска</li><li>Ботокс для волос</li>
+            </ul>
+            <a href="#registration" class="dir-cta-btn">Выбрать это направление →</a>
+          </div>
+        </div>
+
+        <div class="dir-card-new reveal" data-dir="Косметология">
+          <img class="dir-bg" src="foto/cosmo.jpg" alt="Косметология" />
+          <div class="dir-overlay"></div>
+          <div class="dir-default">
+            <h3 class="dir-name">Косметология</h3>
+            <span class="dir-hint">наведи, чтобы узнать больше</span>
+          </div>
+          <div class="dir-hover-content">
+            <h3 class="dir-hover-title">Косметология / Уход</h3>
+            <ul class="dir-services-list">
+              <li>Чистка лица</li><li>Мезотерапия</li>
+              <li>Биоревитализация</li><li>Пилинг химический</li>
+              <li>Перманентный макияж</li><li>RF-лифтинг</li>
+              <li>Ультразвуковая чистка</li><li>Микротоки</li>
+            </ul>
+            <a href="#registration" class="dir-cta-btn">Выбрать это направление →</a>
+          </div>
+        </div>
+
+        <div class="dir-card-new reveal reveal--delay-1" data-dir="Визаж">
+          <img class="dir-bg" src="https://img.magnific.com/premium-photo/make-up-glamour-portrait-beautiful-woman-model-with-fresh-makeup-romantic-wavy-hairstyle_162568-150.jpg" alt="Визаж" loading="lazy" />
+          <div class="dir-overlay"></div>
+          <div class="dir-default">
+            <h3 class="dir-name">Визаж<br/>Макияж</h3>
+            <span class="dir-hint">наведи, чтобы узнать больше</span>
+          </div>
+          <div class="dir-hover-content">
+            <h3 class="dir-hover-title">Визаж / Макияж</h3>
+            <ul class="dir-services-list">
+              <li>Вечерний макияж</li><li>Свадебный макияж</li>
+              <li>Дневной макияж</li><li>Макияж для фотосессий</li>
+              <li>Коррекция бровей</li><li>Окрашивание ресниц</li>
+              <li>Обучение макияжу</li><li>Визаж на выезде</li>
+            </ul>
+            <a href="#registration" class="dir-cta-btn">Выбрать это направление →</a>
+          </div>
+        </div>
+
+        <div class="dir-card-new reveal reveal--delay-2" data-dir="Массаж / СПА">
+          <img class="dir-bg" src="https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?w=700&q=85&fit=crop" alt="Массаж" loading="lazy" />
+          <div class="dir-overlay"></div>
+          <div class="dir-default">
+            <h3 class="dir-name">Массаж<br/>СПА</h3>
+            <span class="dir-hint">наведи, чтобы узнать больше</span>
+          </div>
+          <div class="dir-hover-content">
+            <h3 class="dir-hover-title">Массаж / СПА</h3>
+            <ul class="dir-services-list">
+              <li>Классический массаж</li><li>Расслабляющий массаж</li>
+              <li>Антицеллюлитный</li><li>Лимфодренажный</li>
+              <li>Массаж лица</li><li>Горячие камни</li>
+              <li>СПА-программы</li><li>Обёртывания</li>
+            </ul>
+            <a href="#registration" class="dir-cta-btn">Выбрать это направление →</a>
+          </div>
+        </div>
+
+        <div class="dir-card-new reveal reveal--delay-3" data-dir="Тату / ПМ">
+          <img class="dir-bg" src="https://images.unsplash.com/photo-1611501275019-9b5cda994e8d?w=700&q=85&fit=crop" alt="Тату" loading="lazy" />
+          <div class="dir-overlay"></div>
+          <div class="dir-default">
+            <h3 class="dir-name">Тату<br/>Перм. макияж</h3>
+            <span class="dir-hint">наведи, чтобы узнать больше</span>
+          </div>
+          <div class="dir-hover-content">
+            <h3 class="dir-hover-title">Тату / Перм. макияж</h3>
+            <ul class="dir-services-list">
+              <li>Тату любой сложности</li><li>Перманентный макияж губ</li>
+              <li>ПМ бровей</li><li>ПМ стрелок</li>
+              <li>Коррекция татуажа</li><li>Удаление татуажа</li>
+              <li>Татуаж ареол</li><li>Реалистичный тату</li>
+            </ul>
+            <a href="#registration" class="dir-cta-btn">Выбрать это направление →</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <!-- ░░ HOW IT WORKS ░░ -->
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <section class="section how-it-works" id="how-it-works">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">02 / Процесс</span>
+        <h2 class="section-title">Как это работает</h2>
+        <p class="section-sub">От регистрации до первого клиента — три простых шага</p>
+      </div>
+
+      <div class="steps">
+        <div class="step reveal">
+          <div class="step-number">01</div>
+          <div class="step-content">
+            <h3 class="step-title">Регистрируешься за&nbsp;1&nbsp;минуту</h3>
+            <p class="step-text">Имя, направление, телефон или email. Никаких лишних полей — только то, что важно.</p>
+          </div>
+          <div class="step-connector"></div>
+        </div>
+        <div class="step reveal reveal--delay-1">
+          <div class="step-number">02</div>
+          <div class="step-content">
+            <h3 class="step-title">Получаешь свою&nbsp;страницу</h3>
+            <p class="step-text">Сразу видишь, как тебя видят клиенты. Личная ссылка готова — кидай в Instagram прямо сейчас.</p>
+          </div>
+          <div class="step-connector"></div>
+        </div>
+        <div class="step reveal reveal--delay-2">
+          <div class="step-number">03</div>
+          <div class="step-content">
+            <h3 class="step-title">Клиенты записываются&nbsp;онлайн</h3>
+            <p class="step-text">Ты работаешь руками — мы принимаем заявки. Телефон больше не разрывается.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Demo preview -->
+      <div class="demo-preview reveal">
+        <div class="demo-preview-label">Демо — страница мастера</div>
+        <div class="demo-preview-frame">
+          <div class="demo-preview-bar">
+            <span class="demo-dot"></span><span class="demo-dot"></span><span class="demo-dot"></span>
+            <span class="demo-url">beautymaster.by/<strong>anastasia-koval</strong></span>
+          </div>
+          <div class="demo-preview-content">
+            <div class="demo-avatar">АК</div>
+            <div class="demo-info">
+              <div class="demo-name">Анастасия Коваль</div>
+              <div class="demo-spec">💅 Мастер маникюра · Минск</div>
+              <div class="demo-stars">★★★★★ <span>4.9</span></div>
+            </div>
+            <a href="pages/master-profile.html" target="_blank" class="demo-open-btn">Открыть →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <!-- ░░ HOT OFFER ░░ -->
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <section class="hot-offer" id="hot-offer">
+    <div class="hot-offer-bg"></div>
+    <div class="container hot-offer-inner reveal">
+      <div class="hot-offer-badge">
+        <span class="hot-fire">🔥</span> Специальное предложение
+      </div>
+      <h2 class="hot-offer-title">ГОРЯЧЕЕ ПРЕДЛОЖЕНИЕ —<br/><em>для тех, кто решает быстро</em></h2>
+      <p class="hot-offer-sub">Закажи без тестового периода и получи скидку <strong>50%</strong> на создание сайта под ключ</p>
+      <div class="hot-offer-features">
+        <div class="hot-feature">
+          <span class="hot-feature-icon">⚡</span>
+          <div>
+            <strong>3–5 дней</strong>
+            <span>приложение готово</span>
+          </div>
+        </div>
+        <div class="hot-feature">
+          <span class="hot-feature-icon">✦</span>
+          <div>
+            <strong>В твоём стиле</strong>
+            <span>с твоими услугами и ценами</span>
+          </div>
+        </div>
+        <div class="hot-feature">
+          <span class="hot-feature-icon">💰</span>
+          <div>
+            <strong>от 250 BYN</strong>
+            <span>вместо от 500 BYN</span>
+          </div>
+        </div>
+      </div>
+      <div class="hot-offer-price-block">
+        <div class="hot-price-old">от 500 BYN</div>
+        <div class="hot-price-new">от 250 <span>BYN</span></div>
+        <a href="#registration" class="hot-offer-btn">
+          Хочу со скидкой 50%
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <p class="hot-offer-note">Предложение ограничено · Только для новых мастеров</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <!-- ░░ PRICING ░░ -->
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <section class="section pricing" id="pricing">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">03 / Условия</span>
+        <h2 class="section-title">Простые и честные условия</h2>
+        <p class="section-sub">Два отдельных продукта — без путаницы</p>
+      </div>
+
+      <!-- Hot offer callout in pricing -->
+      <div class="pricing-hot-callout reveal">
+        <span class="hot-fire-sm">🔥</span>
+        <span>Горячее предложение: создание под ключ всего <strong>от 250 BYN</strong> — скидка 50% если начинаешь без триала</span>
+        <a href="#hot-offer">Подробнее →</a>
+      </div>
+
+      <div class="pricing-grid">
+        <!-- Card 1 -->
+        <div class="pricing-card reveal">
+          <div class="pricing-card-label">Создание</div>
+          <div class="pricing-price">
+            <span class="pricing-from">от</span>
+            <span class="pricing-amount">500</span>
+            <span class="pricing-currency">BYN</span>
+          </div>
+          <p class="pricing-note">Рассчитывается индивидуально в зависимости от ваших пожеланий</p>
+          <ul class="pricing-features">
+            <li><span class="check">✦</span> Личная страница мастера</li>
+            <li><span class="check">✦</span> Портфолио работ (фото)</li>
+            <li><span class="check">✦</span> Онлайн-запись клиентов</li>
+            <li><span class="check">✦</span> AI-помощник для текстов</li>
+            <li><span class="check">✦</span> Ваша личная ссылка</li>
+            <li><span class="check">✦</span> PWA — работает как приложение</li>
+          </ul>
+          <a href="#registration" class="btn btn--outline">Обсудить проект</a>
+        </div>
+
+        <!-- Card 2 (featured) -->
+        <div class="pricing-card pricing-card--featured reveal reveal--delay-1">
+          <div class="pricing-card-badge">Ежемесячно</div>
+          <div class="pricing-card-label">Сопровождение</div>
+          <div class="pricing-price">
+            <span class="pricing-from">от</span>
+            <span class="pricing-amount">25</span>
+            <span class="pricing-currency">BYN<small>/мес</small></span>
+          </div>
+          <p class="pricing-note">После создания. Страница работает и принимает клиентов</p>
+          <ul class="pricing-features">
+            <li><span class="check">✦</span> Страница принимает клиентов</li>
+            <li><span class="check">✦</span> Техническая поддержка</li>
+            <li><span class="check">✦</span> Вы управляете всем сами</li>
+            <li><span class="check">✦</span> Обновления платформы</li>
+            <li><span class="check">✦</span> Как абонплата за телефон</li>
+          </ul>
+          <a href="#registration" class="btn btn--gold">Начать бесплатно</a>
+          <p class="pricing-trial-note">21 день пробного периода включён</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <!-- ░░ TRIAL BANNER ░░ -->
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <section class="trial-banner">
+    <div class="trial-banner-bg"></div>
+    <div class="container trial-banner-inner reveal">
+      <div class="trial-text">
+        <h2 class="trial-title">21 день бесплатно —<br /><em>без карты, без рисков</em></h2>
+        <p class="trial-sub">Получи свою страницу прямо сейчас. Покажи клиентам. Убедись сама.</p>
+      </div>
+      <a href="#registration" class="btn btn--gold btn--lg">
+        <span>Начать бесплатно</span>
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3.5 9h11M10 5l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </section>
+
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <!-- ░░ REGISTRATION ░░ -->
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <section class="section registration" id="registration">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-tag">04 / Старт</span>
+        <h2 class="section-title">Получи свою страницу</h2>
+        <p class="section-sub">Одна минута — и ты внутри. Триал 21 день, никаких обязательств.</p>
+      </div>
+
+      <div class="reg-form-wrap reveal">
+        <form class="reg-form" id="reg-form" novalidate>
+          <div class="form-group">
+            <label class="form-label">Имя мастера</label>
+            <input type="text" class="form-input" id="reg-name" placeholder="Как тебя зовут?" autocomplete="name" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Направление</label>
+            <select class="form-input form-select" id="reg-direction">
+              <option value="">Выбери своё направление</option>
+              <option value="Маникюр / Педикюр">💅 Маникюр / Педикюр</option>
+              <option value="Ресницы">👁️ Ресницы</option>
+              <option value="Брови">🤨 Брови</option>
+              <option value="Волосы">💇 Волосы</option>
+              <option value="Косметология">💆 Косметология / Уход за лицом</option>
+              <option value="Визаж">💋 Визаж / Макияж</option>
+              <option value="Массаж / СПА">🧖 Массаж / СПА</option>
+              <option value="Тату / ПМ">🖋️ Тату / Перманентный макияж</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Телефон или Email</label>
+            <input type="text" class="form-input" id="reg-contact" placeholder="+375 XX XXX-XX-XX или email@gmail.com" />
+          </div>
+          <button type="submit" class="btn btn--gold btn--full">
+            <span>Получить мою страницу</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <p class="form-disclaimer">Триал 21 день · Никаких обязательств · Данные защищены</p>
+        </form>
+
+        <!-- Success state -->
+        <div class="reg-success" id="reg-success" style="display:none;">
+          <div class="reg-success-icon">✦</div>
+          <h3 class="reg-success-title">Отлично! Страница создаётся</h3>
+          <p class="reg-success-text">Мы свяжемся с тобой в течение нескольких часов и пришлём личную ссылку. Триал 21 день уже начался.</p>
+          <a href="pages/master-profile.html" class="btn btn--outline" target="_blank">Посмотреть демо страницу →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <!-- ░░ FOOTER ░░ -->
+  <!-- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ -->
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <a href="#" class="footer-logo">BEAUTYMASTER<span>.BY</span></a>
+        <p class="footer-tagline">Платформа для профессионалов бьюти-индустрии Беларуси</p>
+      </div>
+      <nav class="footer-nav">
+        <a href="#">О платформе</a>
+        <a href="#directions">Для мастеров</a>
+        <a href="#registration">Контакты</a>
+        <a href="pages/master-profile.html" target="_blank">Демо</a>
+      </nav>
+      <div class="footer-copy">© 2025 BeautyMaster.by — Все права защищены</div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
