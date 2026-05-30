@@ -595,8 +595,15 @@ button { cursor: pointer; border: none; background: none; font: inherit; color: 
   appearance: none;
 }
 .bform-input:focus { border-color: var(--gold); }
-.bform-input::placeholder { color: var(--muted-2); }
+.bform-input::placeholder { color: rgba(245,240,232,0.4); }
 .bform-input.input-error { border-color: #c0392b; animation: shake 0.4s; }
+.cform-input.input-error { border-color: #c0392b; animation: shake 0.4s; }
+.field-error {
+  font-size: 0.74rem;
+  color: #e05555;
+  margin-top: 5px;
+  min-height: 14px;
+}
 
 /* Buttons */
 .btn-next, .btn-submit {
@@ -1060,7 +1067,7 @@ button { cursor: pointer; border: none; background: none; font: inherit; color: 
 
 .contact-modal-hint {
   font-size: 0.83rem;
-  color: var(--muted);
+  color: var(--cream);
   margin-bottom: 20px;
   line-height: 1.6;
 }
@@ -1080,7 +1087,7 @@ button { cursor: pointer; border: none; background: none; font: inherit; color: 
   appearance: none;
 }
 .cform-input:focus { border-color: var(--gold); }
-.cform-input::placeholder { color: var(--muted-2); }
+.cform-input::placeholder { color: rgba(245,240,232,0.4); }
 .cform-input.input-error { border-color: #c0392b; animation: shake 0.4s; }
 .cform-textarea { resize: none; }
 .cform-submit {
@@ -1117,7 +1124,7 @@ button { cursor: pointer; border: none; background: none; font: inherit; color: 
 }
 .cform-success p {
   font-size: 0.95rem;
-  color: var(--muted);
+  color: var(--cream);
   line-height: 1.7;
 }
 

@@ -266,19 +266,74 @@ document.querySelectorAll('.time-slot:not(.time-slot--booked)').forEach(slot => 
   });
 });
 
+/* ── Validation helpers ────────────────────────────────────── */
+function showBookingError(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add('input-error');
+  let hint = el.parentElement.querySelector('.field-error');
+  if (!hint) {
+    hint = document.createElement('p');
+    hint.className = 'field-error';
+    el.parentElement.appendChild(hint);
+  }
+  hint.textContent = msg;
+  const clear = () => { el.classList.remove('input-error'); hint.textContent = ''; el.removeEventListener('input', clear); };
+  el.addEventListener('input', clear);
+}
+
+function isValidPhone(val) {
+  return /^[\+\d][\d\s\-\(\)]{6,}$/.test(val);
+}
+
 /* ── Multi-step booking ────────────────────────────────────── */
 window.bookingNext = function (fromStep) {
-  // Validate current step
   if (fromStep === 1) {
     const checked = document.querySelector('[name="service"]:checked');
-    if (!checked) { shakeStep(1); return; }
+    if (!checked) {
+      shakeStep(1);
+      const hint = document.querySelector('#bstep-1 .bstep-hint') || (() => {
+        const p = document.createElement('p');
+        p.className = 'bstep-hint field-error';
+        p.style.textAlign = 'center';
+        p.style.marginTop = '12px';
+        document.querySelector('#bstep-1 .service-radio-grid').after(p);
+        return p;
+      })();
+      hint.textContent = 'Пожалуйста, выберите услугу';
+      return;
+    }
     window.__bookingService = checked.value;
   }
   if (fromStep === 2) {
-    if (!window.__bookingDate) { shakeStep(2); return; }
+    if (!window.__bookingDate) {
+      shakeStep(2);
+      const hint = document.querySelector('#bstep-2 .bstep-hint') || (() => {
+        const p = document.createElement('p');
+        p.className = 'bstep-hint field-error';
+        p.style.textAlign = 'center';
+        p.style.marginTop = '12px';
+        document.querySelector('#bstep-2 .calendar-wrap').after(p);
+        return p;
+      })();
+      hint.textContent = 'Пожалуйста, выберите дату';
+      return;
+    }
   }
   if (fromStep === 3) {
-    if (!window.__bookingTime) { shakeStep(3); return; }
+    if (!window.__bookingTime) {
+      shakeStep(3);
+      const hint = document.querySelector('#bstep-3 .bstep-hint') || (() => {
+        const p = document.createElement('p');
+        p.className = 'bstep-hint field-error';
+        p.style.textAlign = 'center';
+        p.style.marginTop = '12px';
+        document.querySelector('#bstep-3 .time-slots').after(p);
+        return p;
+      })();
+      hint.textContent = 'Пожалуйста, выберите время';
+      return;
+    }
   }
 
   // Move to next step
@@ -327,12 +382,15 @@ bookingForm?.addEventListener('submit', async (e) => {
   const phone = document.getElementById('b-phone')?.value.trim();
 
   let valid = true;
-  if (!name) {
-    document.getElementById('b-name').classList.add('input-error');
+  if (!name || name.length < 2) {
+    showBookingError('b-name', 'Введите ваше имя (минимум 2 символа)');
     valid = false;
   }
   if (!phone) {
-    document.getElementById('b-phone').classList.add('input-error');
+    showBookingError('b-phone', 'Введите номер телефона');
+    valid = false;
+  } else if (!isValidPhone(phone)) {
+    showBookingError('b-phone', 'Неверный формат. Пример: +375291234567');
     valid = false;
   }
   if (!valid) return;
@@ -425,17 +483,29 @@ document.querySelectorAll('.bform-input').forEach(el => {
     });
   });
 
+  function showCFormError(id, msg) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add('input-error');
+    let hint = el.parentElement.querySelector('.field-error');
+    if (!hint) { hint = document.createElement('p'); hint.className = 'field-error'; el.parentElement.appendChild(hint); }
+    hint.textContent = msg;
+    const clear = () => { el.classList.remove('input-error'); hint.textContent = ''; el.removeEventListener('input', clear); };
+    el.addEventListener('input', clear);
+  }
+
   // Order form
   document.getElementById('contact-form-order')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const name    = document.getElementById('co-name').value.trim();
     const phone   = document.getElementById('co-phone').value.trim();
     const message = document.getElementById('co-message').value.trim();
-    if (!name || !phone) {
-      if (!name) document.getElementById('co-name').classList.add('input-error');
-      if (!phone) document.getElementById('co-phone').classList.add('input-error');
-      return;
-    }
+    let valid = true;
+    if (!name || name.length < 2) { showCFormError('co-name', 'Введите ваше имя'); valid = false; }
+    if (!phone) { showCFormError('co-phone', 'Введите номер телефона'); valid = false; }
+    else if (!isValidPhone(phone)) { showCFormError('co-phone', 'Неверный формат. Пример: +375291234567'); valid = false; }
+    if (!message || message.length < 3) { showCFormError('co-message', 'Опишите что вы хотите'); valid = false; }
+    if (!valid) return;
     const btn = e.target.querySelector('.cform-submit');
     btn.disabled = true;
     btn.textContent = 'Отправляем...';
@@ -453,11 +523,11 @@ document.querySelectorAll('.bform-input').forEach(el => {
     e.preventDefault();
     const name  = document.getElementById('cc-name').value.trim();
     const phone = document.getElementById('cc-phone').value.trim();
-    if (!name || !phone) {
-      if (!name) document.getElementById('cc-name').classList.add('input-error');
-      if (!phone) document.getElementById('cc-phone').classList.add('input-error');
-      return;
-    }
+    let valid = true;
+    if (!name || name.length < 2) { showCFormError('cc-name', 'Введите ваше имя'); valid = false; }
+    if (!phone) { showCFormError('cc-phone', 'Введите номер телефона'); valid = false; }
+    else if (!isValidPhone(phone)) { showCFormError('cc-phone', 'Неверный формат. Пример: +375291234567'); valid = false; }
+    if (!valid) return;
     const btn = e.target.querySelector('.cform-submit');
     btn.disabled = true;
     btn.textContent = 'Отправляем...';

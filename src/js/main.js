@@ -137,6 +137,42 @@
   });
 })();
 
+/* ── Validation helpers ────────────────────────────────────── */
+function showError(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.add('input-error');
+  let hint = el.parentElement.querySelector('.field-error');
+  if (!hint) {
+    hint = document.createElement('p');
+    hint.className = 'field-error';
+    el.parentElement.appendChild(hint);
+  }
+  hint.textContent = msg;
+  const clear = () => {
+    el.classList.remove('input-error');
+    hint.textContent = '';
+    el.removeEventListener('input', clear);
+    el.removeEventListener('change', clear);
+  };
+  el.addEventListener('input', clear);
+  el.addEventListener('change', clear);
+}
+
+function isValidContact(val) {
+  const phone = /^[\+\d][\d\s\-\(\)]{6,}$/.test(val);
+  const email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
+  return phone || email;
+}
+
+function isValidPhone(val) {
+  return /^[\+\d][\d\s\-\(\)]{6,}$/.test(val);
+}
+
+function isValidTg(val) {
+  return val === '' || /^@?[a-zA-Z0-9_]{3,}$/.test(val);
+}
+
 /* ── Registration Form ─────────────────────────────────────── */
 (function initRegForm() {
   const form    = document.getElementById('reg-form');
@@ -151,20 +187,29 @@
     const contact = document.getElementById('reg-contact').value.trim();
     const tg      = document.getElementById('reg-tg')?.value.trim() || '';
 
-    if (!name || !dir || !contact) {
-      [
-        { id: 'reg-name',      val: name },
-        { id: 'reg-direction', val: dir },
-        { id: 'reg-contact',   val: contact }
-      ].forEach(({ id, val }) => {
-        if (!val) {
-          const el = document.getElementById(id);
-          el.classList.add('input-error');
-          el.addEventListener('input', () => el.classList.remove('input-error'), { once: true });
-        }
-      });
-      return;
+    let valid = true;
+
+    if (!name || name.length < 2) {
+      showError('reg-name', 'Введите имя (минимум 2 символа)');
+      valid = false;
     }
+    if (!dir) {
+      showError('reg-direction', 'Выберите направление');
+      valid = false;
+    }
+    if (!contact) {
+      showError('reg-contact', 'Введите телефон или email');
+      valid = false;
+    } else if (!isValidContact(contact)) {
+      showError('reg-contact', 'Неверный формат. Пример: +375291234567 или name@mail.com');
+      valid = false;
+    }
+    if (tg && !isValidTg(tg)) {
+      showError('reg-tg', 'Введите корректный ник, например @username');
+      valid = false;
+    }
+
+    if (!valid) return;
 
     const btn = form.querySelector('button[type="submit"]');
     btn.disabled = true;
