@@ -198,10 +198,10 @@ function isValidTg(val) {
       valid = false;
     }
     if (!contact) {
-      showError('reg-contact', 'Введите телефон или email');
+      showError('reg-contact', 'Введите номер телефона');
       valid = false;
-    } else if (!isValidContact(contact)) {
-      showError('reg-contact', 'Неверный формат. Пример: +375291234567 или name@mail.com');
+    } else if (!isValidPhone(contact)) {
+      showError('reg-contact', 'Неверный формат. Пример: +375291234567');
       valid = false;
     }
     if (tg && !isValidTg(tg)) {
