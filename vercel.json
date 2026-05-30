@@ -2,12 +2,15 @@
   "version": 2,
   "name": "beautymaster-by",
   "rewrites": [
+    { "source": "/master/:slug", "destination": "/src/master.html" },
+    { "source": "/master.js",    "destination": "/src/master.js" },
+    { "source": "/master.css",   "destination": "/src/master.css" },
     { "source": "/pages/:path*", "destination": "/src/pages/:path*" },
-    { "source": "/styles/:path*", "destination": "/src/styles/:path*" },
-    { "source": "/js/:path*", "destination": "/src/js/:path*" },
-    { "source": "/foto/:path*", "destination": "/src/foto/:path*" },
+    { "source": "/styles/:path*","destination": "/src/styles/:path*" },
+    { "source": "/js/:path*",    "destination": "/src/js/:path*" },
+    { "source": "/foto/:path*",  "destination": "/src/foto/:path*" },
     { "source": "/foto1/:path*", "destination": "/foto1/:path*" },
     { "source": "/foto2/:path*", "destination": "/foto2/:path*" },
-    { "source": "/", "destination": "/src/index.html" }
+    { "source": "/",             "destination": "/src/index.html" }
   ]
 }

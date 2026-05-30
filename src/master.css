@@ -1,0 +1,19 @@
+/* Extra styles for dynamic master page */
+.profile-avatar-photo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--gold-border);
+}
+.cal-day--off {
+  color: var(--muted-2);
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+.field-error {
+  font-size: 0.74rem;
+  color: #e05555;
+  margin-top: 5px;
+  min-height: 14px;
+}
