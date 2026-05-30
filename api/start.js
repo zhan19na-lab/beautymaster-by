@@ -71,7 +71,10 @@ export default async function handler(req, res) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: chatId,
-        text: '✅ Отлично! Теперь вы будете получать уведомления о новых записях от клиентов прямо сюда.',
+        text:
+          `✅ <b>Отлично!</b> Бот подключён.\n\n` +
+          `Если вы уже оставили заявку на сайте — мы получили её и свяжемся с вами в ближайшее время.\n\n` +
+          `Теперь все уведомления о записях клиентов будут приходить сюда 🌸`,
         parse_mode: 'HTML'
       })
     }).catch(() => {});
