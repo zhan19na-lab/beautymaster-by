@@ -10,7 +10,7 @@ export default async function handler(req, res) {
 
   // List blobs with this slug prefix
   const listRes = await fetch(
-    `https://blob.vercel-storage.com/?prefix=masters/${slug}.json&limit=1`,
+    `https://blob.vercel-storage.com/?prefix=masters/${slug}&limit=1`,
     { headers: { Authorization: `Bearer ${token}` } }
   );
 
