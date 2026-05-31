@@ -160,17 +160,27 @@ function showError(id, msg) {
 }
 
 function isValidContact(val) {
-  const phone = /^[\+\d][\d\s\-\(\)]{6,}$/.test(val);
-  const email = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val);
-  return phone || email;
-}
-
-function isValidPhone(val) {
   return /^[\+\d][\d\s\-\(\)]{6,}$/.test(val);
 }
 
+function isValidPhone(val) {
+  // must start with +, then 10-15 digits (spaces/dashes allowed)
+  return /^\+\d[\d\s\-]{8,14}$/.test(val);
+}
+
 function isValidTg(val) {
-  return val === '' || /^@?[a-zA-Z0-9_]{3,}$/.test(val);
+  // @username: 5-32 chars, only latin letters, digits, underscore
+  return /^@[a-zA-Z0-9_]{5,32}$/.test(val);
+}
+
+function capitalizeFirst(val) {
+  if (!val) return val;
+  return val.charAt(0).toUpperCase() + val.slice(1);
+}
+
+function isValidName(val) {
+  // At least 2 chars, first char must be a letter (any language)
+  return val.length >= 2 && /^\p{L}/u.test(val);
 }
 
 /* ── Registration Form ─────────────────────────────────────── */
@@ -179,18 +189,35 @@ function isValidTg(val) {
   const success = document.getElementById('reg-success');
   if (!form) return;
 
+  // Auto-capitalize name on blur
+  const nameInput = document.getElementById('reg-name');
+  nameInput?.addEventListener('blur', () => {
+    nameInput.value = capitalizeFirst(nameInput.value.trim());
+  });
+
+  // Auto-add @ to tg if missing
+  const tgInput = document.getElementById('reg-tg');
+  tgInput?.addEventListener('blur', () => {
+    const v = tgInput.value.trim();
+    if (v && !v.startsWith('@')) tgInput.value = '@' + v;
+  });
+
   form.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    const name    = document.getElementById('reg-name').value.trim();
+    const nameRaw = document.getElementById('reg-name').value.trim();
+    const name    = capitalizeFirst(nameRaw);
+    document.getElementById('reg-name').value = name;
+
     const dir     = document.getElementById('reg-direction').value;
     const contact = document.getElementById('reg-contact').value.trim();
-    const tg      = document.getElementById('reg-tg')?.value.trim() || '';
+    const tgRaw   = document.getElementById('reg-tg')?.value.trim() || '';
+    const tg      = tgRaw && !tgRaw.startsWith('@') ? '@' + tgRaw : tgRaw;
 
     let valid = true;
 
-    if (!name || name.length < 2) {
-      showError('reg-name', 'Введите имя (минимум 2 символа)');
+    if (!name || !isValidName(name)) {
+      showError('reg-name', 'Введите имя — первая буква должна быть заглавной');
       valid = false;
     }
     if (!dir) {
@@ -201,11 +228,14 @@ function isValidTg(val) {
       showError('reg-contact', 'Введите номер телефона');
       valid = false;
     } else if (!isValidPhone(contact)) {
-      showError('reg-contact', 'Неверный формат. Пример: +375291234567');
+      showError('reg-contact', 'Формат: +375XXXXXXXXX (с плюсом, 11-12 цифр)');
       valid = false;
     }
-    if (tg && !isValidTg(tg)) {
-      showError('reg-tg', 'Введите корректный ник, например @username');
+    if (!tg) {
+      showError('reg-tg', 'Введите ник Telegram — он обязателен');
+      valid = false;
+    } else if (!isValidTg(tg)) {
+      showError('reg-tg', 'Формат: @username (латиница, минимум 5 символов)');
       valid = false;
     }
 
