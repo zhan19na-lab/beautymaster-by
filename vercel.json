@@ -1,6 +1,7 @@
 {
   "version": 2,
   "name": "beautymaster-by",
+  "outputDirectory": ".",
   "rewrites": [
     { "source": "/master/:slug", "destination": "/src/master.html" },
     { "source": "/master.js",    "destination": "/src/master.js" },
