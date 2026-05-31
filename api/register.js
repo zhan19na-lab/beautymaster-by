@@ -47,7 +47,7 @@ export default async function handler(req, res) {
       createdAt: new Date().toISOString()
     };
 
-    const br = await fetch(`https://blob.vercel-storage.com/masters/${slug}.json`, {
+    await fetch(`https://blob.vercel-storage.com/masters/${slug}.json`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${blobToken}`,
@@ -56,15 +56,13 @@ export default async function handler(req, res) {
         'x-vercel-blob-access': 'private'
       },
       body: JSON.stringify(masterData)
-    });
-    const brText = await br.text();
-    console.log('BLOB PUT', br.status, brText);
+    }).catch(() => {});
   }
 
   // Notify admin
   if (token && adminId) {
     const tgInfo = tgUsername ? `\n📱 <b>Telegram:</b> @${tgUsername.replace('@','')}` : '';
-    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    const tgRes = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -72,7 +70,11 @@ export default async function handler(req, res) {
         text: `🌸 <b>Новая регистрация мастера!</b>\n\n👤 <b>Имя:</b> ${name}\n💅 <b>Направление:</b> ${direction}\n📞 <b>Контакт:</b> ${contact}${tgInfo}\n\n🔗 <b>Страница:</b> ${pageUrl}`,
         parse_mode: 'HTML'
       })
-    }).catch(() => {});
+    });
+    const tgText = await tgRes.text();
+    console.log('TG ADMIN', tgRes.status, tgText);
+  } else {
+    console.log('TG SKIP: token=', !!token, 'adminId=', !!adminId);
   }
 
   // Auto-reply to master if chat_id known
