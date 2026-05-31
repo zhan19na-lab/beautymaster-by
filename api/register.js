@@ -25,7 +25,17 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { name, direction, contact, tgUsername } = req.body || {};
-  if (!name || !direction || !contact) return res.status(400).json({ error: 'Missing fields' });
+  if (!name || !direction || !contact || !tgUsername) return res.status(400).json({ error: 'Missing fields' });
+
+  // Server-side validation
+  const phoneDigits = contact.replace(/\D/g, '');
+  if (!contact.startsWith('+') || phoneDigits.length < 11 || phoneDigits.length > 13) {
+    return res.status(400).json({ error: 'Invalid phone format' });
+  }
+  const tgClean = tgUsername.startsWith('@') ? tgUsername : '@' + tgUsername;
+  if (!/^@[a-zA-Z0-9_]{5,32}$/.test(tgClean)) {
+    return res.status(400).json({ error: 'Invalid Telegram username' });
+  }
 
   const slugRaw   = toSlug(name);
   const slug      = slugRaw || `master-${Date.now()}`;
