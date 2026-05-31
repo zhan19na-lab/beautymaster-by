@@ -27,7 +27,8 @@ export default async function handler(req, res) {
   const { name, direction, contact, tgUsername } = req.body || {};
   if (!name || !direction || !contact) return res.status(400).json({ error: 'Missing fields' });
 
-  const slug      = toSlug(name);
+  const slugRaw   = toSlug(name);
+  const slug      = slugRaw || `master-${Date.now()}`;
   const editToken = generateToken();
   const pageUrl   = `https://beautymaster-by.vercel.app/master/${slug}`;
   const editUrl   = `https://beautymaster-by.vercel.app/master/${slug}?token=${editToken}`;
