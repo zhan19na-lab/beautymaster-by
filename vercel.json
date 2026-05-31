@@ -1,7 +1,9 @@
 {
   "version": 2,
   "name": "beautymaster-by",
-  "outputDirectory": ".",
+  "redirects": [
+    { "source": "/index.html", "destination": "/", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/master/:slug", "destination": "/src/master.html" },
     { "source": "/master.js",    "destination": "/src/master.js" },
@@ -12,7 +14,6 @@
     { "source": "/foto/:path*",  "destination": "/src/foto/:path*" },
     { "source": "/foto1/:path*", "destination": "/foto1/:path*" },
     { "source": "/foto2/:path*", "destination": "/foto2/:path*" },
-    { "source": "/index.html",   "destination": "/src/index.html" },
     { "source": "/",             "destination": "/src/index.html" }
   ]
 }
