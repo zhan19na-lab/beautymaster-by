@@ -1,3 +1,10 @@
+function generateToken() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  let t = '';
+  for (let i = 0; i < 32; i++) t += chars[Math.floor(Math.random() * chars.length)];
+  return t;
+}
+
 function toSlug(name) {
   const map = {
     'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'yo','ж':'zh','з':'z',
@@ -20,8 +27,10 @@ export default async function handler(req, res) {
   const { name, direction, contact, tgUsername } = req.body || {};
   if (!name || !direction || !contact) return res.status(400).json({ error: 'Missing fields' });
 
-  const slug    = toSlug(name);
-  const pageUrl = `https://beautymaster-by.vercel.app/master/${slug}`;
+  const slug      = toSlug(name);
+  const editToken = generateToken();
+  const pageUrl   = `https://beautymaster-by.vercel.app/master/${slug}`;
+  const editUrl   = `https://beautymaster-by.vercel.app/master/${slug}?token=${editToken}`;
   const token   = process.env.TELEGRAM_BOT_TOKEN;
   const adminId = process.env.TELEGRAM_CHAT_ID;
   const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
@@ -29,7 +38,7 @@ export default async function handler(req, res) {
   // Create master page in Blob storage
   if (blobToken) {
     const masterData = {
-      slug, name, specialty: direction, phone: contact,
+      slug, name, specialty: direction, phone: contact, editToken,
       tgUsername: tgUsername?.replace('@','') || '',
       city: 'Беларусь',
       bio: '',
@@ -83,7 +92,7 @@ export default async function handler(req, res) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: masterChatId,
-          text: `✅ <b>Заявка получена, ${name}!</b>\n\nЯ получила вашу заявку и свяжусь с вами в ближайшее время.\n\n🔗 <b>Ваша страница уже готова:</b>\n${pageUrl}`,
+          text: `✅ <b>Заявка получена, ${name}!</b>\n\nЯ получила вашу заявку и свяжусь с вами в ближайшее время.\n\n🔗 <b>Ваша личная ссылка для редактирования:</b>\n${editUrl}\n\n⚠️ Эту ссылку никому не передавайте — по ней можно изменять ваш профиль.\n\n👁 <b>Публичная ссылка для клиентов:</b>\n${pageUrl}`,
           parse_mode: 'HTML',
           disable_web_page_preview: false
         })

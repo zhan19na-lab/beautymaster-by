@@ -12,8 +12,23 @@
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 })();
 
+/* ── Owner check via token ─────────────────────────────────── */
+async function checkOwner() {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+  if (!token) return false;
+  const slug = window.location.pathname.split('/').filter(Boolean).pop();
+  try {
+    const r = await fetch(`/api/verify-token?slug=${slug}&token=${token}`);
+    const d = await r.json();
+    return d.valid === true;
+  } catch { return false; }
+}
+
 /* ── Inline editing (double-click to edit) ─────────────────── */
-(function initInlineEdit() {
+(async function initInlineEdit() {
+  const isOwner = await checkOwner();
+  if (!isOwner) return;
   const editables = [
     { sel: '.profile-name',    key: 'master-name',    hint: 'Введите имя мастера' },
     { sel: '.profile-bio',     key: 'master-bio',     hint: 'Введите описание' },
