@@ -47,7 +47,7 @@ export default async function handler(req, res) {
       createdAt: new Date().toISOString()
     };
 
-    await fetch(`https://blob.vercel-storage.com/masters/${slug}.json`, {
+    const blobResp = await fetch(`https://blob.vercel-storage.com/masters/${slug}.json`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${blobToken}`,
@@ -56,7 +56,13 @@ export default async function handler(req, res) {
         'x-vercel-blob-access': 'public'
       },
       body: JSON.stringify(masterData)
-    }).catch(() => {});
+    });
+    if (!blobResp.ok) {
+      const blobErr = await blobResp.text();
+      console.error('BLOB ERROR:', blobResp.status, blobErr);
+    } else {
+      console.log('BLOB OK:', await blobResp.text());
+    }
   }
 
   // Notify admin
