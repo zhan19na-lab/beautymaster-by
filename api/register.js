@@ -47,7 +47,7 @@ export default async function handler(req, res) {
       createdAt: new Date().toISOString()
     };
 
-    await fetch(`https://blob.vercel-storage.com/masters/${slug}.json`, {
+    const br = await fetch(`https://blob.vercel-storage.com/masters/${slug}.json`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${blobToken}`,
@@ -56,7 +56,9 @@ export default async function handler(req, res) {
         'x-vercel-blob-access': 'private'
       },
       body: JSON.stringify(masterData)
-    }).catch(() => {});
+    });
+    const brText = await br.text();
+    console.log('BLOB PUT', br.status, brText);
   }
 
   // Notify admin

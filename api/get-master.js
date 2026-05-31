@@ -17,6 +17,7 @@ export default async function handler(req, res) {
   if (!listRes.ok) return res.status(500).json({ error: 'Storage error' });
 
   const list = await listRes.json();
+  console.log('BLOB LIST', JSON.stringify(list));
   const blob = list.blobs?.[0];
   if (!blob) return res.status(404).json({ error: 'Master not found' });
 
