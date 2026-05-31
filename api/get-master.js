@@ -20,7 +20,10 @@ export default async function handler(req, res) {
   const blob = list.blobs?.[0];
   if (!blob) return res.status(404).json({ error: 'Master not found' });
 
-  const dataRes = await fetch(blob.url);
+  const fetchUrl = blob.downloadUrl || blob.url;
+  const dataRes = await fetch(fetchUrl, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
   if (!dataRes.ok) return res.status(500).json({ error: 'Failed to load data' });
 
   const data = await dataRes.json();

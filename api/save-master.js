@@ -32,7 +32,7 @@ export default async function handler(req, res) {
       'Authorization': `Bearer ${token}`,
       'content-type': 'application/json',
       'x-vercel-blob-add-random-suffix': '0',
-      'x-vercel-blob-access': 'public'
+      'x-vercel-blob-access': 'private'
     },
     body: JSON.stringify(payload)
   });
