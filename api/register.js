@@ -62,7 +62,7 @@ export default async function handler(req, res) {
   // Notify admin
   if (token && adminId) {
     const tgInfo = tgUsername ? `\n📱 <b>Telegram:</b> @${tgUsername.replace('@','')}` : '';
-    const tgRes = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -70,11 +70,7 @@ export default async function handler(req, res) {
         text: `🌸 <b>Новая регистрация мастера!</b>\n\n👤 <b>Имя:</b> ${name}\n💅 <b>Направление:</b> ${direction}\n📞 <b>Контакт:</b> ${contact}${tgInfo}\n\n🔗 <b>Страница:</b> ${pageUrl}`,
         parse_mode: 'HTML'
       })
-    });
-    const tgText = await tgRes.text();
-    console.log('TG ADMIN', tgRes.status, tgText);
-  } else {
-    console.log('TG SKIP: token=', !!token, 'adminId=', !!adminId);
+    }).catch(() => {});
   }
 
   // Auto-reply to master if chat_id known
