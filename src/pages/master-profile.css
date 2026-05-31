@@ -113,6 +113,24 @@ button { cursor: pointer; border: none; background: none; font: inherit; color: 
   position: relative;
   flex-shrink: 0;
 }
+.avatar-upload-btn {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0A0A0A;
+  z-index: 3;
+  transition: transform 0.2s, background 0.2s;
+}
+.avatar-upload-btn:hover { transform: scale(1.1); background: var(--gold-light); }
 .profile-avatar {
   width: clamp(100px, 15vw, 140px);
   height: clamp(100px, 15vw, 140px);
@@ -316,6 +334,27 @@ button { cursor: pointer; border: none; background: none; font: inherit; color: 
   transition: opacity 0.3s;
 }
 .portfolio-item:hover .portfolio-overlay { opacity: 1; }
+.portfolio-add-btn {
+  min-height: 160px;
+  background: rgba(201,169,110,0.05);
+  border: 2px dashed var(--gold-border);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.portfolio-add-btn:hover { border-color: var(--gold); background: rgba(201,169,110,0.1); }
+.portfolio-add-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 160px;
+  gap: 10px;
+  color: var(--gold);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
 .portfolio-overlay span {
   font-size: 0.8rem;
   color: var(--gold-light);

@@ -25,6 +25,90 @@ async function checkOwner() {
   } catch { return false; }
 }
 
+/* ── Photo upload ───────────────────────────────────────────── */
+(async function initPhotoUpload() {
+  const isOwner = await checkOwner();
+  if (!isOwner) return;
+
+  const params    = new URLSearchParams(window.location.search);
+  const token     = params.get('token');
+  const slug      = window.location.pathname.split('/').filter(Boolean).pop();
+
+  function showUploadToast(msg, ok = true) {
+    const t = document.createElement('div');
+    t.textContent = msg;
+    t.style.cssText = `position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#141414;border:1px solid ${ok ? 'var(--gold-border)' : '#c0392b'};color:${ok ? '#81C784' : '#e74c3c'};font-size:0.82rem;padding:10px 24px;z-index:9999;border-radius:4px;`;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2500);
+  }
+
+  async function uploadPhoto(file, photoType) {
+    const toastMsg = photoType === 'avatar' ? 'Загружаем аватарку...' : 'Загружаем фото...';
+    showUploadToast(toastMsg);
+    try {
+      const res = await fetch('/api/upload-photo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': file.type,
+          'x-slug': slug,
+          'x-token': token,
+          'x-photo-type': photoType
+        },
+        body: file
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || 'Ошибка');
+
+      if (photoType === 'avatar') {
+        const avatarEl = document.getElementById('profile-avatar');
+        if (avatarEl) {
+          avatarEl.style.backgroundImage = `url(${data.url})`;
+          avatarEl.style.backgroundSize = 'cover';
+          avatarEl.style.backgroundPosition = 'center';
+          avatarEl.textContent = '';
+        }
+        showUploadToast('✓ Аватарка обновлена');
+      } else {
+        const grid = document.getElementById('portfolio-grid');
+        const addBtn = document.getElementById('portfolio-add-btn');
+        const item = document.createElement('div');
+        item.className = 'portfolio-item reveal';
+        item.innerHTML = `<img src="${data.url}" alt="Работа мастера" loading="lazy" /><div class="portfolio-overlay"><span>Моя работа</span></div>`;
+        grid.insertBefore(item, addBtn);
+        showUploadToast('✓ Фото добавлено в портфолио');
+      }
+    } catch (err) {
+      showUploadToast('Ошибка загрузки: ' + err.message, false);
+    }
+  }
+
+  // Avatar upload
+  const avatarBtn   = document.getElementById('avatar-upload-btn');
+  const avatarInput = document.getElementById('avatar-file-input');
+  if (avatarBtn && avatarInput) {
+    avatarBtn.style.display = 'flex';
+    avatarBtn.addEventListener('click', () => avatarInput.click());
+    avatarInput.addEventListener('change', e => {
+      const file = e.target.files?.[0];
+      if (file) uploadPhoto(file, 'avatar');
+      avatarInput.value = '';
+    });
+  }
+
+  // Portfolio upload
+  const addBtn       = document.getElementById('portfolio-add-btn');
+  const portfolioInput = document.getElementById('portfolio-file-input');
+  if (addBtn && portfolioInput) {
+    addBtn.style.display = 'block';
+    addBtn.addEventListener('click', () => portfolioInput.click());
+    portfolioInput.addEventListener('change', e => {
+      const file = e.target.files?.[0];
+      if (file) uploadPhoto(file, 'portfolio');
+      portfolioInput.value = '';
+    });
+  }
+})();
+
 /* ── Inline editing (double-click to edit) ─────────────────── */
 (async function initInlineEdit() {
   const isOwner = await checkOwner();
