@@ -31,7 +31,8 @@ export default async function handler(req, res) {
     headers: {
       'Authorization': `Bearer ${token}`,
       'content-type': 'application/json',
-      'x-vercel-blob-add-random-suffix': '0'
+      'x-vercel-blob-add-random-suffix': '0',
+      'x-vercel-blob-access': 'public'
     },
     body: JSON.stringify(payload)
   });
