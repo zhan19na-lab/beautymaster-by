@@ -37,7 +37,8 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Invalid Telegram username' });
   }
 
-  const slugRaw   = toSlug(name);
+  const nameFixed = name.charAt(0).toUpperCase() + name.slice(1);
+  const slugRaw   = toSlug(nameFixed);
   const slug      = slugRaw || `master-${Date.now()}`;
   const editToken = generateToken();
   const pageUrl   = `https://beautymaster-by.vercel.app/master/${slug}`;
@@ -49,7 +50,7 @@ export default async function handler(req, res) {
   // Create master page in Blob storage
   if (blobToken) {
     const masterData = {
-      slug, name, specialty: direction, phone: contact, editToken,
+      slug, name: nameFixed, specialty: direction, phone: contact, editToken,
       tgUsername: tgUsername?.replace('@','') || '',
       city: 'Беларусь',
       bio: '',

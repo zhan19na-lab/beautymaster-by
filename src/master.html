@@ -43,6 +43,10 @@
           <img class="profile-avatar-photo" id="master-avatar-photo" style="display:none;" alt="Фото мастера" />
           <div class="profile-avatar-ring"></div>
           <div class="profile-online-badge" title="Принимает запись">●</div>
+          <button class="avatar-upload-btn" id="avatar-upload-btn" style="display:none" title="Изменить фото">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </button>
+          <input type="file" id="avatar-file-input" accept="image/*" style="display:none" />
         </div>
         <div class="profile-info">
           <div class="profile-spec-badge" id="master-spec">💅 Мастер</div>
@@ -78,6 +82,25 @@
     </section>
 
     <!-- SERVICES -->
+    <!-- PORTFOLIO -->
+    <section class="psection portfolio-section" id="portfolio">
+      <div class="container">
+        <div class="psection-header reveal">
+          <span class="psection-tag">Галерея работ</span>
+          <h2 class="psection-title">Портфолио</h2>
+        </div>
+        <div class="portfolio-grid" id="portfolio-grid">
+          <div class="portfolio-item portfolio-add-btn" id="portfolio-add-btn" style="display:none">
+            <div class="portfolio-add-inner">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              <span>Добавить фото</span>
+            </div>
+          </div>
+          <input type="file" id="portfolio-file-input" accept="image/*" style="display:none" />
+        </div>
+      </div>
+    </section>
+
     <section class="psection services-section" id="services">
       <div class="container">
         <div class="psection-header reveal">

@@ -461,6 +461,134 @@ function initSmoothScroll() {
   });
 }
 
+/* ── Owner check ─── */
+async function checkOwner() {
+  const params = new URLSearchParams(window.location.search);
+  const token = params.get('token');
+  if (!token) return false;
+  const slug = getSlug();
+  try {
+    const r = await fetch(`/api/verify-token?slug=${slug}&token=${token}`);
+    const d = await r.json();
+    return d.valid === true;
+  } catch { return false; }
+}
+
+/* ── Owner edit mode ─── */
+async function initOwnerMode() {
+  const isOwner = await checkOwner();
+  if (!isOwner) return;
+
+  const params  = new URLSearchParams(window.location.search);
+  const token   = params.get('token');
+  const slug    = getSlug();
+
+  // Show edit hint bar
+  const hint = document.createElement('div');
+  hint.className = 'edit-hint-bar';
+  hint.innerHTML = '✎ &nbsp;Дважды кликни на имя, описание или цену — чтобы изменить прямо здесь';
+  document.querySelector('.pnav')?.after(hint);
+
+  // Show avatar upload button
+  const avatarBtn = document.getElementById('avatar-upload-btn');
+  const avatarInput = document.getElementById('avatar-file-input');
+  if (avatarBtn) avatarBtn.style.display = 'flex';
+
+  // Show portfolio add button
+  const addBtn = document.getElementById('portfolio-add-btn');
+  if (addBtn) addBtn.style.display = 'block';
+
+  function showToast(msg, ok = true) {
+    const t = document.createElement('div');
+    t.textContent = msg;
+    t.style.cssText = `position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#141414;border:1px solid ${ok ? 'var(--gold-border)' : '#c0392b'};color:${ok ? '#81C784' : '#e74c3c'};font-size:0.82rem;padding:10px 24px;z-index:9999;border-radius:4px;`;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 2500);
+  }
+
+  async function uploadPhoto(file, photoType) {
+    showToast(photoType === 'avatar' ? 'Загружаем аватарку...' : 'Загружаем фото...');
+    try {
+      const res = await fetch('/api/upload-photo', {
+        method: 'POST',
+        headers: { 'Content-Type': file.type, 'x-slug': slug, 'x-token': token, 'x-photo-type': photoType },
+        body: file
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || 'Ошибка');
+      if (photoType === 'avatar') {
+        const img = document.getElementById('master-avatar-photo');
+        const ini = document.getElementById('master-avatar-initials');
+        if (img) { img.src = data.url; img.style.display = 'block'; }
+        if (ini) ini.style.display = 'none';
+        showToast('✓ Аватарка обновлена');
+      } else {
+        const grid = document.getElementById('portfolio-grid');
+        const addBtnEl = document.getElementById('portfolio-add-btn');
+        const item = document.createElement('div');
+        item.className = 'portfolio-item reveal';
+        item.innerHTML = `<img src="${data.url}" alt="Работа мастера" loading="lazy" /><div class="portfolio-overlay"><span>Моя работа</span></div>`;
+        if (grid && addBtnEl) grid.insertBefore(item, addBtnEl);
+        else if (grid) grid.appendChild(item);
+        showToast('✓ Фото добавлено в портфолио');
+      }
+    } catch (err) { showToast('Ошибка: ' + err.message, false); }
+  }
+
+  avatarInput?.addEventListener('change', e => {
+    const file = e.target.files?.[0];
+    if (file) uploadPhoto(file, 'avatar');
+    avatarInput.value = '';
+  });
+  avatarBtn?.addEventListener('click', () => avatarInput?.click());
+
+  const portfolioInput = document.getElementById('portfolio-file-input');
+  addBtn?.addEventListener('click', () => portfolioInput?.click());
+  portfolioInput?.addEventListener('change', e => {
+    const file = e.target.files?.[0];
+    if (file) uploadPhoto(file, 'portfolio');
+    portfolioInput.value = '';
+  });
+
+  // Inline editing
+  function makeEditable(el, onSave) {
+    if (!el) return;
+    el.style.cursor = 'pointer';
+    el.title = 'Дважды кликни, чтобы изменить';
+    el.addEventListener('dblclick', () => {
+      const original = el.textContent;
+      const inp = document.createElement('input');
+      inp.value = original;
+      inp.style.cssText = `background:transparent;border:none;border-bottom:1px solid var(--gold);color:inherit;font-size:inherit;padding:2px 0;font-family:inherit;outline:none;width:100%;`;
+      el.replaceWith(inp);
+      inp.focus(); inp.select();
+      const save = () => {
+        const val = inp.value.trim() || original;
+        el.textContent = val;
+        inp.replaceWith(el);
+        onSave(val);
+      };
+      inp.addEventListener('blur', save);
+      inp.addEventListener('keydown', e => { if (e.key === 'Enter') inp.blur(); if (e.key === 'Escape') inp.replaceWith(el); });
+    });
+  }
+
+  makeEditable(document.getElementById('master-name'), val => saveField('name', val));
+  makeEditable(document.getElementById('master-bio'),  val => saveField('bio', val));
+  makeEditable(document.getElementById('master-city'), val => saveField('city', val));
+
+  async function saveField(field, val) {
+    const updated = { ...masterData, [field]: val };
+    await fetch('/api/save-master', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...updated, slug, token })
+    }).catch(() => {});
+    masterData = updated;
+    showToast('✓ Сохранено');
+  }
+}
+
 /* ── Init ─── */
 (async () => {
   const data = await loadMaster();
@@ -470,4 +598,5 @@ function initSmoothScroll() {
     return;
   }
   renderPage(data);
+  initOwnerMode();
 })();
