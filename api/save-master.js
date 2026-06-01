@@ -1,15 +1,3 @@
-function toSlug(name) {
-  const map = {
-    'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'yo','ж':'zh','з':'z',
-    'и':'i','й':'y','к':'k','л':'l','м':'m','н':'n','о':'o','п':'p','р':'r',
-    'с':'s','т':'t','у':'u','ф':'f','х':'h','ц':'ts','ч':'ch','ш':'sh','щ':'sch',
-    'ъ':'','ы':'y','ь':'','э':'e','ю':'yu','я':'ya'
-  };
-  return name.toLowerCase()
-    .split('').map(c => map[c] ?? (c === ' ' ? '-' : c))
-    .join('').replace(/[^a-z0-9\-]/g,'').replace(/-+/g,'-').replace(/^-|-$/g,'');
-}
-
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -18,18 +6,36 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
   const data = req.body || {};
-  if (!data.name) return res.status(400).json({ error: 'Name required' });
+  const { slug, token: editToken } = data;
+  if (!slug || !editToken) return res.status(400).json({ error: 'Missing slug or token' });
 
-  const slug  = data.slug || toSlug(data.name);
-  const token = process.env.BLOB_READ_WRITE_TOKEN;
-  if (!token) return res.status(500).json({ error: 'Storage not configured' });
+  const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+  if (!blobToken) return res.status(500).json({ error: 'Storage not configured' });
 
-  const payload = { ...data, slug, updatedAt: new Date().toISOString() };
+  // Verify token
+  const listRes = await fetch(
+    `https://blob.vercel-storage.com/?prefix=masters/${slug}&limit=1`,
+    { headers: { Authorization: `Bearer ${blobToken}` } }
+  );
+  if (!listRes.ok) return res.status(500).json({ error: 'Storage error' });
+  const list = await listRes.json();
+  const masterBlob = list.blobs?.[0];
+  if (!masterBlob) return res.status(404).json({ error: 'Master not found' });
 
-  const r = await fetch(`https://blob.vercel-storage.com/masters/${slug}.json`, {
+  const existingRes = await fetch(masterBlob.downloadUrl || masterBlob.url, {
+    headers: { Authorization: `Bearer ${blobToken}` }
+  });
+  const existing = await existingRes.json();
+  if (existing.editToken !== editToken) return res.status(403).json({ error: 'Forbidden' });
+
+  // Save — keep editToken, update everything else
+  const payload = { ...existing, ...data, editToken: existing.editToken, updatedAt: new Date().toISOString() };
+  delete payload.token;
+
+  const r = await fetch(`https://blob.vercel-storage.com/${masterBlob.pathname}`, {
     method: 'PUT',
     headers: {
-      'Authorization': `Bearer ${token}`,
+      'Authorization': `Bearer ${blobToken}`,
       'content-type': 'application/json',
       'x-vercel-blob-add-random-suffix': '0',
       'x-vercel-blob-access': 'private'
@@ -42,6 +48,5 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Storage error', details: err });
   }
 
-  const pageUrl = `https://beautymaster-by.vercel.app/master/${slug}`;
-  return res.status(200).json({ success: true, slug, url: pageUrl });
+  return res.status(200).json({ success: true, slug, url: `https://beautymaster-by.vercel.app/master/${slug}` });
 }

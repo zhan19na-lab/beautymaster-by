@@ -492,6 +492,24 @@ async function initOwnerMode() {
   hint.innerHTML = '✎ &nbsp;Дважды кликни на имя, описание или цену — чтобы изменить прямо здесь';
   document.querySelector('.pnav')?.after(hint);
 
+  // Public link panel — always visible while editing
+  const publicUrl = `https://beautymaster-by.vercel.app/master/${slug}`;
+  const linkBar = document.createElement('div');
+  linkBar.style.cssText = `position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid rgba(201,169,110,0.25);padding:10px 16px;display:flex;align-items:center;gap:10px;z-index:9000;`;
+  linkBar.innerHTML = `
+    <span style="color:#6A6A6A;font-size:0.75rem;white-space:nowrap;">👁 Ссылка для клиентов:</span>
+    <span id="owner-pub-url" style="color:#C9A96E;font-size:0.78rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${publicUrl}</span>
+    <button id="owner-copy-btn" style="background:rgba(201,169,110,0.15);border:1px solid rgba(201,169,110,0.3);color:#C9A96E;font-size:0.75rem;padding:6px 12px;border-radius:4px;cursor:pointer;white-space:nowrap;">Скопировать</button>
+  `;
+  document.body.appendChild(linkBar);
+  document.getElementById('owner-copy-btn').addEventListener('click', () => {
+    navigator.clipboard.writeText(publicUrl).then(() => {
+      const btn = document.getElementById('owner-copy-btn');
+      btn.textContent = '✓ Скопировано';
+      setTimeout(() => { btn.textContent = 'Скопировать'; }, 2000);
+    });
+  });
+
   // Show welcome instruction modal (once)
   const storageKey = `bm-guide-${slug}`;
   if (!localStorage.getItem(storageKey)) {
@@ -503,24 +521,24 @@ async function initOwnerMode() {
         <div style="text-align:center;margin-bottom:24px;">
           <div style="font-size:2rem;margin-bottom:8px;">✦</div>
           <h2 style="font-family:'Cormorant Garant',serif;font-size:1.6rem;color:#F5F0E8;margin-bottom:6px;">Добро пожаловать!</h2>
-          <p style="color:#6A6A6A;font-size:0.85rem;">Вы в личном кабинете мастера. Вот как настроить свою страницу:</p>
+          <p style="color:#E8D5B0;font-size:0.85rem;font-style:italic;">Вы в личном кабинете мастера. Вот как настроить свою страницу:</p>
         </div>
         <div style="display:flex;flex-direction:column;gap:16px;">
           <div style="display:flex;gap:14px;align-items:flex-start;">
             <div style="min-width:32px;height:32px;border-radius:50%;background:rgba(201,169,110,0.15);border:1px solid rgba(201,169,110,0.3);display:flex;align-items:center;justify-content:center;color:#C9A96E;font-size:0.85rem;font-weight:600;">1</div>
-            <div><p style="color:#F5F0E8;font-size:0.9rem;margin-bottom:2px;"><strong>Фото профиля</strong></p><p style="color:#6A6A6A;font-size:0.82rem;">Нажмите на золотую кнопку ↑ в правом углу аватара → выберите фото с телефона</p></div>
+            <div><p style="color:#F5F0E8;font-size:0.9rem;margin-bottom:2px;"><strong>Фото профиля</strong></p><p style="color:#E8D5B0;font-size:0.82rem;font-style:italic;">Нажмите на золотую кнопку ↑ в правом углу аватара → выберите фото с телефона</p></div>
           </div>
           <div style="display:flex;gap:14px;align-items:flex-start;">
             <div style="min-width:32px;height:32px;border-radius:50%;background:rgba(201,169,110,0.15);border:1px solid rgba(201,169,110,0.3);display:flex;align-items:center;justify-content:center;color:#C9A96E;font-size:0.85rem;font-weight:600;">2</div>
-            <div><p style="color:#F5F0E8;font-size:0.9rem;margin-bottom:2px;"><strong>Имя и описание</strong></p><p style="color:#6A6A6A;font-size:0.82rem;">Дважды кликните на имя, город или текст о себе → напишите своё → нажмите Enter</p></div>
+            <div><p style="color:#F5F0E8;font-size:0.9rem;margin-bottom:2px;"><strong>Имя и описание</strong></p><p style="color:#E8D5B0;font-size:0.82rem;font-style:italic;">Дважды кликните на имя, город или текст о себе → напишите своё → нажмите Enter</p></div>
           </div>
           <div style="display:flex;gap:14px;align-items:flex-start;">
             <div style="min-width:32px;height:32px;border-radius:50%;background:rgba(201,169,110,0.15);border:1px solid rgba(201,169,110,0.3);display:flex;align-items:center;justify-content:center;color:#C9A96E;font-size:0.85rem;font-weight:600;">3</div>
-            <div><p style="color:#F5F0E8;font-size:0.9rem;margin-bottom:2px;"><strong>Фото работ</strong></p><p style="color:#6A6A6A;font-size:0.82rem;">Прокрутите вниз до раздела "Портфолио" → нажмите плитку с + → выберите фото работы</p></div>
+            <div><p style="color:#F5F0E8;font-size:0.9rem;margin-bottom:2px;"><strong>Фото работ</strong></p><p style="color:#E8D5B0;font-size:0.82rem;font-style:italic;">Прокрутите вниз до раздела "Портфолио" → нажмите плитку с + → выберите фото работы</p></div>
           </div>
           <div style="display:flex;gap:14px;align-items:flex-start;">
             <div style="min-width:32px;height:32px;border-radius:50%;background:rgba(201,169,110,0.15);border:1px solid rgba(201,169,110,0.3);display:flex;align-items:center;justify-content:center;color:#C9A96E;font-size:0.85rem;font-weight:600;">4</div>
-            <div><p style="color:#F5F0E8;font-size:0.9rem;margin-bottom:2px;"><strong>Ссылка для клиентов</strong></p><p style="color:#6A6A6A;font-size:0.82rem;">Публичная ссылка из Telegram — делитесь ею в Instagram, TikTok, WhatsApp</p></div>
+            <div><p style="color:#F5F0E8;font-size:0.9rem;margin-bottom:2px;"><strong>Ссылка для клиентов</strong></p><p style="color:#E8D5B0;font-size:0.82rem;font-style:italic;">Публичная ссылка из Telegram — делитесь ею в Instagram, TikTok, WhatsApp</p></div>
           </div>
         </div>
         <div style="margin-top:8px;padding:12px;background:rgba(201,169,110,0.07);border-radius:8px;border-left:3px solid #C9A96E;">
@@ -637,6 +655,90 @@ async function initOwnerMode() {
     masterData = updated;
     showToast('✓ Сохранено');
   }
+
+  async function saveServices(services) {
+    masterData = { ...masterData, services };
+    await fetch('/api/save-master', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...masterData, slug, token })
+    }).catch(() => {});
+    showToast('✓ Услуги сохранены');
+  }
+
+  // Services editing for owner
+  function initServicesEdit() {
+    const sl = document.getElementById('services-list');
+    if (!sl) return;
+
+    // Re-render with edit controls
+    function renderServices() {
+      const services = masterData.services || [];
+      sl.innerHTML = services.map((s, i) => `
+        <div class="service-row" data-index="${i}">
+          <div class="service-info">
+            <span class="service-name owner-editable" data-field="name" data-index="${i}" title="Двойной клик — изменить">${s.name}</span>
+            <span class="service-desc owner-editable" data-field="desc" data-index="${i}" title="Двойной клик — изменить">${s.desc || ''}</span>
+          </div>
+          <span class="service-price owner-editable" data-field="price" data-index="${i}" title="Двойной клик — изменить цену">${s.price}</span>
+          <button class="service-delete-btn" data-index="${i}" style="background:none;border:1px solid rgba(201,169,110,0.2);color:#6A6A6A;cursor:pointer;padding:4px 8px;border-radius:4px;font-size:0.75rem;margin-left:8px;" title="Удалить услугу">✕</button>
+          <a href="#booking" class="service-book-btn">Записаться</a>
+        </div>
+      `).join('') + `
+        <button id="add-service-btn" style="margin-top:16px;width:100%;padding:12px;background:rgba(201,169,110,0.07);border:1px dashed rgba(201,169,110,0.3);color:#C9A96E;cursor:pointer;border-radius:6px;font-size:0.85rem;letter-spacing:0.05em;">+ Добавить услугу</button>
+      `;
+
+      // Double-click editing for service fields
+      sl.querySelectorAll('.owner-editable').forEach(el => {
+        el.style.cursor = 'pointer';
+        el.addEventListener('dblclick', () => {
+          const idx = parseInt(el.dataset.index);
+          const field = el.dataset.field;
+          const original = el.textContent;
+          const inp = document.createElement('input');
+          inp.value = original;
+          inp.style.cssText = `background:transparent;border:none;border-bottom:1px solid var(--gold);color:inherit;font-size:inherit;padding:2px 0;font-family:inherit;outline:none;width:100%;`;
+          el.replaceWith(inp);
+          inp.focus(); inp.select();
+          const save = () => {
+            const val = inp.value.trim() || original;
+            el.textContent = val;
+            inp.replaceWith(el);
+            const services = [...(masterData.services || [])];
+            services[idx] = { ...services[idx], [field]: val };
+            saveServices(services);
+          };
+          inp.addEventListener('blur', save);
+          inp.addEventListener('keydown', e => { if (e.key === 'Enter') inp.blur(); if (e.key === 'Escape') inp.replaceWith(el); });
+        });
+      });
+
+      // Delete service
+      sl.querySelectorAll('.service-delete-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const idx = parseInt(btn.dataset.index);
+          const services = [...(masterData.services || [])];
+          services.splice(idx, 1);
+          masterData = { ...masterData, services };
+          saveServices(services);
+          renderServices();
+        });
+      });
+
+      // Add service
+      document.getElementById('add-service-btn')?.addEventListener('click', () => {
+        const services = [...(masterData.services || [])];
+        services.push({ name: 'Новая услуга', desc: 'Описание', price: 'Уточняйте' });
+        masterData = { ...masterData, services };
+        saveServices(services);
+        renderServices();
+      });
+    }
+
+    renderServices();
+  }
+
+  initServicesEdit();
 }
 
 /* ── Init ─── */
