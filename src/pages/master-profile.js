@@ -382,7 +382,8 @@ function showBookingError(id, msg) {
 }
 
 function isValidPhone(val) {
-  return /^[\+\d][\d\s\-\(\)]{6,}$/.test(val);
+  const digits = val.replace(/\D/g, '');
+  return val.startsWith('+') && digits.length >= 11 && digits.length <= 13;
 }
 
 /* ── Multi-step booking ────────────────────────────────────── */

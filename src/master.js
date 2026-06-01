@@ -272,7 +272,10 @@ function renderTimeSlots(date) {
 }
 
 /* ── Booking form ─── */
-function isValidPhone(v) { return /^[\+\d][\d\s\-\(\)]{6,}$/.test(v); }
+function isValidPhone(v) {
+  const digits = v.replace(/\D/g, '');
+  return v.startsWith('+') && digits.length >= 11 && digits.length <= 13;
+}
 
 function showErr(id, msg) {
   const el = document.getElementById(id);
