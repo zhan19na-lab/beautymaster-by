@@ -274,7 +274,7 @@ function renderTimeSlots(date) {
 /* ── Booking form ─── */
 function isValidPhone(v) {
   const digits = v.replace(/\D/g, '');
-  return v.startsWith('+') && digits.length >= 11 && digits.length <= 13;
+  return v.startsWith('+') && digits.length >= 11 && digits.length <= 12;
 }
 
 function showErr(id, msg) {

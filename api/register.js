@@ -95,7 +95,7 @@ export default async function handler(req, res) {
 
   // Server-side validation
   const phoneDigits = contact.replace(/\D/g, '');
-  if (!contact.startsWith('+') || phoneDigits.length < 11 || phoneDigits.length > 13) {
+  if (!contact.startsWith('+') || phoneDigits.length < 11 || phoneDigits.length > 12) {
     return res.status(400).json({ error: 'Invalid phone format' });
   }
   const tgClean = tgUsername.startsWith('@') ? tgUsername : '@' + tgUsername;
@@ -170,7 +170,7 @@ export default async function handler(req, res) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: masterChatId,
-          text: `✅ <b>Заявка получена, ${name}!</b>\n\nЯ получила вашу заявку и свяжусь с вами в ближайшее время.\n\n🔗 <b>Ваша личная ссылка для редактирования:</b>\n${editUrl}\n\n⚠️ Эту ссылку никому не передавайте — по ней можно изменять ваш профиль.\n\n👁 <b>Публичная ссылка для клиентов:</b>\n${pageUrl}`,
+          text: `✅ <b>Заявка получена, ${nameFixed}!</b>\n\n🎉 Ваша страница уже готова — настройте её прямо сейчас.\n\n🔗 <b>Ваша личная ссылка для редактирования:</b>\n${editUrl}\n\n⚠️ Эту ссылку никому не передавайте — по ней можно изменять ваш профиль.\n\n👁 <b>Публичная ссылка для клиентов:</b>\n${pageUrl}\n\nПоделитесь публичной ссылкой в Instagram, TikTok и WhatsApp — клиенты смогут записаться онлайн.`,
           parse_mode: 'HTML',
           disable_web_page_preview: false
         })

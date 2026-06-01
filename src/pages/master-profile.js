@@ -383,7 +383,7 @@ function showBookingError(id, msg) {
 
 function isValidPhone(val) {
   const digits = val.replace(/\D/g, '');
-  return val.startsWith('+') && digits.length >= 11 && digits.length <= 13;
+  return val.startsWith('+') && digits.length >= 11 && digits.length <= 12;
 }
 
 /* ── Multi-step booking ────────────────────────────────────── */

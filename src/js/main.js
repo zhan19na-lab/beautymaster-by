@@ -164,9 +164,8 @@ function isValidContact(val) {
 }
 
 function isValidPhone(val) {
-  // must start with +, digits only after, total 11-13 digits (e.g. +375291234567 = 12)
   const digitsOnly = val.replace(/\D/g, '');
-  return val.startsWith('+') && digitsOnly.length >= 11 && digitsOnly.length <= 13;
+  return val.startsWith('+') && digitsOnly.length >= 11 && digitsOnly.length <= 12;
 }
 
 function isValidTg(val) {
