@@ -489,6 +489,53 @@ async function initOwnerMode() {
   hint.innerHTML = '✎ &nbsp;Дважды кликни на имя, описание или цену — чтобы изменить прямо здесь';
   document.querySelector('.pnav')?.after(hint);
 
+  // Show welcome instruction modal (once)
+  const storageKey = `bm-guide-${slug}`;
+  if (!localStorage.getItem(storageKey)) {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px;`;
+    overlay.innerHTML = `
+      <div style="background:#111;border:1px solid rgba(201,169,110,0.3);border-radius:12px;max-width:480px;width:100%;padding:32px 28px;position:relative;max-height:90vh;overflow-y:auto;">
+        <button id="guide-close" style="position:absolute;top:16px;right:16px;background:none;border:none;color:#6A6A6A;font-size:20px;cursor:pointer;line-height:1;">✕</button>
+        <div style="text-align:center;margin-bottom:24px;">
+          <div style="font-size:2rem;margin-bottom:8px;">✦</div>
+          <h2 style="font-family:'Cormorant Garant',serif;font-size:1.6rem;color:#F5F0E8;margin-bottom:6px;">Добро пожаловать!</h2>
+          <p style="color:#6A6A6A;font-size:0.85rem;">Вы в личном кабинете мастера. Вот как настроить свою страницу:</p>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div style="display:flex;gap:14px;align-items:flex-start;">
+            <div style="min-width:32px;height:32px;border-radius:50%;background:rgba(201,169,110,0.15);border:1px solid rgba(201,169,110,0.3);display:flex;align-items:center;justify-content:center;color:#C9A96E;font-size:0.85rem;font-weight:600;">1</div>
+            <div><p style="color:#F5F0E8;font-size:0.9rem;margin-bottom:2px;"><strong>Фото профиля</strong></p><p style="color:#6A6A6A;font-size:0.82rem;">Нажмите на золотую кнопку ↑ в правом углу аватара → выберите фото с телефона</p></div>
+          </div>
+          <div style="display:flex;gap:14px;align-items:flex-start;">
+            <div style="min-width:32px;height:32px;border-radius:50%;background:rgba(201,169,110,0.15);border:1px solid rgba(201,169,110,0.3);display:flex;align-items:center;justify-content:center;color:#C9A96E;font-size:0.85rem;font-weight:600;">2</div>
+            <div><p style="color:#F5F0E8;font-size:0.9rem;margin-bottom:2px;"><strong>Имя и описание</strong></p><p style="color:#6A6A6A;font-size:0.82rem;">Дважды кликните на имя, город или текст о себе → напишите своё → нажмите Enter</p></div>
+          </div>
+          <div style="display:flex;gap:14px;align-items:flex-start;">
+            <div style="min-width:32px;height:32px;border-radius:50%;background:rgba(201,169,110,0.15);border:1px solid rgba(201,169,110,0.3);display:flex;align-items:center;justify-content:center;color:#C9A96E;font-size:0.85rem;font-weight:600;">3</div>
+            <div><p style="color:#F5F0E8;font-size:0.9rem;margin-bottom:2px;"><strong>Фото работ</strong></p><p style="color:#6A6A6A;font-size:0.82rem;">Прокрутите вниз до раздела "Портфолио" → нажмите плитку с + → выберите фото работы</p></div>
+          </div>
+          <div style="display:flex;gap:14px;align-items:flex-start;">
+            <div style="min-width:32px;height:32px;border-radius:50%;background:rgba(201,169,110,0.15);border:1px solid rgba(201,169,110,0.3);display:flex;align-items:center;justify-content:center;color:#C9A96E;font-size:0.85rem;font-weight:600;">4</div>
+            <div><p style="color:#F5F0E8;font-size:0.9rem;margin-bottom:2px;"><strong>Ссылка для клиентов</strong></p><p style="color:#6A6A6A;font-size:0.82rem;">Публичная ссылка из Telegram — делитесь ею в Instagram, TikTok, WhatsApp</p></div>
+          </div>
+        </div>
+        <div style="margin-top:8px;padding:12px;background:rgba(201,169,110,0.07);border-radius:8px;border-left:3px solid #C9A96E;">
+          <p style="color:#C9A96E;font-size:0.8rem;">⚠️ Эту ссылку (с токеном в адресе) никому не передавайте — по ней можно редактировать ваш профиль</p>
+        </div>
+        <button id="guide-start" style="width:100%;margin-top:20px;padding:14px;background:#C9A96E;border:none;border-radius:6px;color:#0A0A0A;font-size:0.9rem;font-weight:600;cursor:pointer;letter-spacing:0.05em;">Понятно, начать настройку →</button>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+    const close = () => {
+      overlay.remove();
+      localStorage.setItem(storageKey, '1');
+    };
+    document.getElementById('guide-close').addEventListener('click', close);
+    document.getElementById('guide-start').addEventListener('click', close);
+    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+  }
+
   // Show avatar upload button
   const avatarBtn = document.getElementById('avatar-upload-btn');
   const avatarInput = document.getElementById('avatar-file-input');
