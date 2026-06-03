@@ -5,3 +5,4 @@ Thumbs.db
 
 .vercel
 .env*.local
+.env.prod
