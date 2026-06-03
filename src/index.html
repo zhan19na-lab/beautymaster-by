@@ -510,9 +510,27 @@
         <!-- Success state -->
         <div class="reg-success" id="reg-success" style="display:none;">
           <div class="reg-success-icon">✦</div>
-          <h3 class="reg-success-title">Заявка получена!</h3>
-          <p class="reg-success-text">Мы получили твою заявку и свяжемся в ближайшее время. Также загляни в Telegram — там придёт подтверждение.</p>
-          <a href="pages/master-profile.html" class="btn btn--outline" target="_blank">Посмотреть демо страницу →</a>
+          <h3 class="reg-success-title">Ваша страница готова!</h3>
+          <p class="reg-success-text">Сохраните ссылки — они больше нигде не появятся!</p>
+
+          <div style="background:rgba(201,169,110,0.08);border:1px solid rgba(201,169,110,0.3);border-radius:8px;padding:20px;margin:20px 0;text-align:left;">
+            <p style="font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;color:#C9A96E;margin-bottom:12px;">🔗 Ваша личная ссылка для редактирования</p>
+            <p id="reg-edit-url" style="font-size:0.82rem;color:#F5F0E8;word-break:break-all;margin-bottom:10px;"></p>
+            <button onclick="copyRegLink('edit')" style="background:rgba(201,169,110,0.15);border:1px solid rgba(201,169,110,0.3);color:#C9A96E;padding:8px 16px;border-radius:4px;font-size:0.8rem;cursor:pointer;">Скопировать</button>
+          </div>
+
+          <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:20px;margin:20px 0;text-align:left;">
+            <p style="font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;color:#8a7a6a;margin-bottom:12px;">👁 Публичная ссылка для клиентов</p>
+            <p id="reg-pub-url" style="font-size:0.82rem;color:#F5F0E8;word-break:break-all;margin-bottom:10px;"></p>
+            <button onclick="copyRegLink('pub')" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#8a7a6a;padding:8px 16px;border-radius:4px;font-size:0.8rem;cursor:pointer;">Скопировать</button>
+          </div>
+
+          <div style="background:rgba(74,154,106,0.08);border:1px solid rgba(74,154,106,0.3);border-radius:8px;padding:16px;margin:20px 0;text-align:left;">
+            <p style="font-size:0.85rem;color:#4a9a6a;margin-bottom:6px;">📱 Чтобы получать уведомления о новых записях:</p>
+            <p style="font-size:0.82rem;color:#c8bfb0;">Найдите в Telegram бота <strong style="color:#F5F0E8;">@Beauty88888_bot</strong> и напишите ему <strong style="color:#F5F0E8;">/start</strong></p>
+          </div>
+
+          <a id="reg-page-link" href="#" class="btn btn--gold" target="_blank" style="margin-top:8px;">Открыть мою страницу →</a>
         </div>
       </div>
     </div>

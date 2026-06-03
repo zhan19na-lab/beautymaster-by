@@ -22,6 +22,7 @@ const SERVICES_BY_DIRECTION = {
   ],
   'Волосы': [
     { name: 'Стрижка женская', desc: 'Модельная стрижка с укладкой', price: 'от 30 BYN' },
+    { name: 'Стрижка мужская', desc: 'Классическая или модельная стрижка', price: 'от 30 BYN' },
     { name: 'Окрашивание волос', desc: 'Однотонное окрашивание', price: 'от 60 BYN' },
     { name: 'Мелирование / Балаяж', desc: 'Техника осветления прядей', price: 'от 80 BYN' },
     { name: 'Кератиновое выпрямление', desc: 'Разглаживание и восстановление', price: 'от 120 BYN' },
@@ -187,5 +188,5 @@ export default async function handler(req, res) {
     }
   }
 
-  return res.status(200).json({ success: true, slug, url: pageUrl });
+  return res.status(200).json({ success: true, slug, url: pageUrl, editToken });
 }

@@ -259,6 +259,19 @@ function isValidName(val) {
           sessionStorage.removeItem('reg_source');
           form.style.display = 'none';
           success.style.display = 'flex';
+          // Fill in links directly on page
+          if (data.slug && data.editToken) {
+            const editUrl = `https://beautymaster-by.vercel.app/master/${data.slug}?token=${data.editToken}`;
+            const pubUrl  = `https://beautymaster-by.vercel.app/master/${data.slug}`;
+            const editEl  = document.getElementById('reg-edit-url');
+            const pubEl   = document.getElementById('reg-pub-url');
+            const pageBtn = document.getElementById('reg-page-link');
+            if (editEl) editEl.textContent = editUrl;
+            if (pubEl)  pubEl.textContent  = pubUrl;
+            if (pageBtn) pageBtn.href = editUrl;
+            window._regEditUrl = editUrl;
+            window._regPubUrl  = pubUrl;
+          }
         } else {
           btn.disabled = false;
           btn.innerHTML = '<span>Получить страницу бесплатно →</span>';
@@ -272,6 +285,15 @@ function isValidName(val) {
       });
   });
 })();
+
+/* ── Copy reg links ───────────────────────────────────────── */
+function copyRegLink(type) {
+  const url = type === 'edit' ? window._regEditUrl : window._regPubUrl;
+  if (!url) return;
+  navigator.clipboard.writeText(url).then(() => {
+    alert('Ссылка скопирована!');
+  });
+}
 
 /* ── VIP offer button ─────────────────────────────────────── */
 document.getElementById('vip-offer-btn')?.addEventListener('click', () => {

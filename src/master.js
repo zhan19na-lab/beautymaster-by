@@ -45,7 +45,7 @@ function renderPage(d) {
   document.getElementById('master-spec').textContent = `💅 ${d.specialty || 'Мастер красоты'}`;
   document.getElementById('master-city').textContent = `${d.city || 'Беларусь'} · Принимаю на дому`;
   document.getElementById('master-bio').textContent = d.bio || '';
-  document.getElementById('booking-title').textContent = `Записаться к ${d.name?.split(' ')[0] || 'мастеру'}`;
+  document.getElementById('booking-title').textContent = 'Онлайн-запись к мастеру';
   document.getElementById('footer-copy').textContent = `© 2025 ${d.name} · Все права защищены`;
 
   // Avatar
