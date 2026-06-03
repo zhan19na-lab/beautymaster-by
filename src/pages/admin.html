@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="robots" content="noindex,nofollow"/>
+  <title>Админ — BeautyMaster.by</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:#0a0a0a;color:#F5F0E8;font-family:'Segoe UI',sans-serif;min-height:100vh}
+    .login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+    .login-box{background:#141414;border:1px solid #2a2a2a;border-radius:12px;padding:40px;width:100%;max-width:360px;text-align:center}
+    .login-logo{font-size:0.85rem;letter-spacing:0.2em;color:#C9A96E;margin-bottom:24px}
+    .login-title{font-size:1.4rem;margin-bottom:24px;color:#F5F0E8}
+    .login-input{width:100%;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;color:#F5F0E8;font-size:1rem;padding:12px 16px;outline:none;margin-bottom:16px}
+    .login-input:focus{border-color:#C9A96E}
+    .login-btn{width:100%;padding:13px;background:#C9A96E;color:#0a0a0a;border:none;border-radius:8px;font-size:1rem;cursor:pointer;font-weight:600}
+    .login-btn:hover{opacity:0.88}
+    .login-error{color:#e05555;font-size:0.85rem;margin-top:8px;display:none}
+
+    .admin-wrap{display:none;padding:24px 32px;max-width:1200px;margin:0 auto}
+    .admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid #2a2a2a}
+    .admin-logo{font-size:0.9rem;letter-spacing:0.18em;color:#C9A96E}
+    .admin-title{font-size:1.6rem;color:#F5F0E8}
+    .admin-logout{background:none;border:1px solid #2a2a2a;color:#8a7a6a;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:0.85rem}
+    .admin-logout:hover{border-color:#C9A96E;color:#C9A96E}
+
+    .summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px}
+    .summary-card{background:#141414;border:1px solid #2a2a2a;border-radius:10px;padding:20px;text-align:center}
+    .summary-num{font-size:2rem;color:#C9A96E;margin-bottom:4px}
+    .summary-label{font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:#6a5a4a}
+
+    .masters-table{width:100%;border-collapse:collapse}
+    .masters-table th{font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;color:#C9A96E;padding:10px 12px;text-align:left;border-bottom:1px solid #2a2a2a}
+    .masters-table td{padding:14px 12px;border-bottom:1px solid #1a1a1a;font-size:0.88rem;vertical-align:middle}
+    .masters-table tr:hover td{background:rgba(201,169,110,0.04)}
+
+    .badge-trial{background:rgba(201,169,110,0.15);color:#C9A96E;padding:3px 10px;border-radius:20px;font-size:0.75rem}
+    .badge-expired{background:rgba(224,85,85,0.15);color:#e05555;padding:3px 10px;border-radius:20px;font-size:0.75rem}
+    .badge-ending{background:rgba(224,150,85,0.15);color:#e09655;padding:3px 10px;border-radius:20px;font-size:0.75rem}
+
+    .trend-up{color:#4a9a6a}
+    .trend-down{color:#e05555}
+    .trend-stable{color:#6a5a4a}
+
+    .weeks{display:flex;gap:6px;align-items:center}
+    .week-bar{display:flex;flex-direction:column;align-items:center;gap:2px}
+    .week-val{font-size:0.85rem;font-weight:600}
+    .week-lbl{font-size:0.65rem;color:#6a5a4a}
+
+    .contact-links{display:flex;gap:8px}
+    .contact-link{font-size:0.78rem;color:#C9A96E;text-decoration:none;padding:4px 8px;border:1px solid rgba(201,169,110,0.3);border-radius:4px}
+    .contact-link:hover{background:rgba(201,169,110,0.1)}
+
+    .master-name{font-weight:600;color:#F5F0E8}
+    .master-spec{font-size:0.78rem;color:#8a7a6a;margin-top:2px}
+
+    .loading{text-align:center;padding:60px;color:#6a5a4a;font-style:italic}
+
+    @media(max-width:900px){.summary-grid{grid-template-columns:repeat(2,1fr)}.admin-wrap{padding:16px}}
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="login-wrap">
+  <div class="login-box">
+    <div class="login-logo">BEAUTYMASTER.BY</div>
+    <div class="login-title">Панель администратора</div>
+    <input class="login-input" type="password" id="login-pwd" placeholder="Пароль" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <button class="login-btn" onclick="doLogin()">Войти</button>
+    <div class="login-error" id="login-error">Неверный пароль</div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="admin-wrap" id="admin-wrap">
+  <div class="admin-header">
+    <div>
+      <div class="admin-logo">BEAUTYMASTER.BY</div>
+      <div class="admin-title">Все мастера</div>
+    </div>
+    <button class="admin-logout" onclick="logout()">Выйти</button>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="summary-num" id="s-total">—</div>
+      <div class="summary-label">Всего мастеров</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-num" id="s-active">—</div>
+      <div class="summary-label">На триале</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-num" id="s-ending">—</div>
+      <div class="summary-label">Заканчивают скоро</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-num" id="s-bookings">—</div>
+      <div class="summary-label">Всего записей</div>
+    </div>
+  </div>
+
+  <div id="table-wrap">
+    <div class="loading">Загружаем данные...</div>
+  </div>
+</div>
+
+<script>
+let adminKey = '';
+
+function doLogin() {
+  const pwd = document.getElementById('login-pwd').value;
+  adminKey = pwd;
+  loadMasters();
+}
+
+function logout() {
+  adminKey = '';
+  document.getElementById('admin-wrap').style.display = 'none';
+  document.getElementById('login-wrap').style.display = 'flex';
+  document.getElementById('login-pwd').value = '';
+}
+
+async function loadMasters() {
+  try {
+    const res = await fetch('/api/admin-masters', {
+      headers: { 'x-admin-key': adminKey }
+    });
+    if (res.status === 401) {
+      document.getElementById('login-error').style.display = 'block';
+      return;
+    }
+    const data = await res.json();
+    const masters = data.masters || [];
+
+    document.getElementById('login-wrap').style.display = 'none';
+    document.getElementById('admin-wrap').style.display = 'block';
+
+    // Summary
+    const active  = masters.filter(m => m.daysLeft > 0).length;
+    const ending  = masters.filter(m => m.daysLeft > 0 && m.daysLeft <= 3).length;
+    const totalB  = masters.reduce((s, m) => s + m.totalBookings, 0);
+    document.getElementById('s-total').textContent    = masters.length;
+    document.getElementById('s-active').textContent   = active;
+    document.getElementById('s-ending').textContent   = ending;
+    document.getElementById('s-bookings').textContent = totalB;
+
+    // Table
+    if (masters.length === 0) {
+      document.getElementById('table-wrap').innerHTML = '<div class="loading">Мастеров пока нет</div>';
+      return;
+    }
+
+    const rows = masters.map(m => {
+      const badge = m.daysLeft <= 0
+        ? `<span class="badge-expired">Истёк</span>`
+        : m.daysLeft <= 3
+          ? `<span class="badge-ending">⚠️ ${m.daysLeft} дн.</span>`
+          : `<span class="badge-trial">${m.daysLeft} дн.</span>`;
+
+      const trendIcon = m.trend === 'up' ? '📈' : m.trend === 'down' ? '📉' : '➡️';
+
+      const tgLink = m.tgUsername
+        ? `<a class="contact-link" href="https://t.me/${m.tgUsername}" target="_blank">TG</a>`
+        : '';
+      const waLink = m.phone
+        ? `<a class="contact-link" href="https://wa.me/${m.phone.replace(/[^0-9]/g,'')}" target="_blank">WA</a>`
+        : '';
+
+      const date = new Date(m.createdAt).toLocaleDateString('ru-RU');
+
+      return `<tr>
+        <td>
+          <div class="master-name">${m.name}</div>
+          <div class="master-spec">${m.specialty || '—'}</div>
+        </td>
+        <td>${date}</td>
+        <td>${badge}</td>
+        <td>
+          <div class="weeks">
+            <div class="week-bar"><div class="week-val">${m.week1}</div><div class="week-lbl">Нед 1</div></div>
+            <div class="week-bar"><div class="week-val">${m.week2}</div><div class="week-lbl">Нед 2</div></div>
+            <div class="week-bar"><div class="week-val">${m.week3}</div><div class="week-lbl">Нед 3</div></div>
+          </div>
+        </td>
+        <td><strong>${m.totalBookings}</strong> ${trendIcon}</td>
+        <td>
+          <div class="contact-links">
+            <a class="contact-link" href="/master/${m.slug}" target="_blank">Сайт</a>
+            ${tgLink}${waLink}
+            <button class="contact-link" style="cursor:pointer;background:none;" onclick="extendSub('${m.slug}','${m.name}')">+1 мес</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+
+    document.getElementById('table-wrap').innerHTML = `
+      <table class="masters-table">
+        <thead><tr>
+          <th>Мастер</th>
+          <th>Регистрация</th>
+          <th>Триал</th>
+          <th>Записи по неделям</th>
+          <th>Всего</th>
+          <th>Контакты</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  } catch(e) {
+    document.getElementById('login-error').textContent = 'Ошибка сети';
+    document.getElementById('login-error').style.display = 'block';
+  }
+}
+
+async function extendSub(slug, name) {
+  if (!confirm(`Продлить подписку для ${name} на 1 месяц?`)) return;
+  const res = await fetch('/api/admin-set-subscription', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey },
+    body: JSON.stringify({ slug, months: 1 })
+  });
+  const data = await res.json();
+  if (data.success) {
+    alert(`✅ Подписка ${name} продлена до ${new Date(data.subscriptionExpiry).toLocaleDateString('ru-RU')}`);
+    loadMasters();
+  } else {
+    alert('Ошибка: ' + data.error);
+  }
+}
+</script>
+</body>
+</html>

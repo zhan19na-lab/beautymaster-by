@@ -27,6 +27,22 @@ const blob = list.blobs?.[0];
   if (!dataRes.ok) return res.status(500).json({ error: 'Failed to load data' });
 
   const data = await dataRes.json();
+
+  // Check subscription status
+  const now = new Date();
+  const created = new Date(data.createdAt);
+  const daysSince = Math.floor((now - created) / (1000 * 60 * 60 * 24));
+
+  if (data.subscriptionExpiry) {
+    const expiry = new Date(data.subscriptionExpiry);
+    data.isExpired = now > expiry;
+    data.subscriptionDaysLeft = Math.max(0, Math.ceil((expiry - now) / (1000 * 60 * 60 * 24)));
+  } else {
+    // Still on trial
+    data.isExpired = daysSince > 21 && !data.isPaid;
+    data.subscriptionDaysLeft = Math.max(0, 21 - daysSince);
+  }
+
   res.setHeader('Cache-Control', 'no-store');
   return res.status(200).json(data);
 }

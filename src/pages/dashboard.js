@@ -42,8 +42,54 @@ document.querySelectorAll('.snav-item[data-section]').forEach(item => {
     // Close mobile sidebar
     document.getElementById('sidebar').classList.remove('open');
     document.body.style.overflow = '';
+
+    // Load stats when switching to stats section
+    if (section === 'stats') loadStats();
   });
 });
+
+/* ── Statistics ────────────────────────────────────────────── */
+async function loadStats() {
+  const params = new URLSearchParams(window.location.search);
+  const token  = params.get('token');
+  const slug   = window.location.pathname.split('/master/')[1]?.split('?')[0];
+  if (!slug || !token) return;
+
+  try {
+    const res  = await fetch(`/api/get-master?slug=${slug}`);
+    const data = await res.json();
+    const bookings = data.bookings || [];
+
+    document.getElementById('stat-total').textContent = bookings.length || '0';
+
+    const now   = new Date();
+    const month = bookings.filter(b => {
+      const d = new Date(b.createdAt);
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }).length;
+    document.getElementById('stat-month').textContent = month || '0';
+
+    // Top service
+    const serviceCounts = {};
+    bookings.forEach(b => { if (b.service && b.service !== '—') serviceCounts[b.service] = (serviceCounts[b.service] || 0) + 1; });
+    const topService = Object.entries(serviceCounts).sort((a,b) => b[1]-a[1])[0];
+    document.getElementById('stat-top-service').textContent = topService ? topService[0] : '—';
+
+    // Bookings list
+    const list = document.getElementById('stat-bookings-list');
+    if (bookings.length === 0) {
+      list.innerHTML = '<div class="stat-empty">Записей пока нет — поделитесь ссылкой на вашу страницу с клиентами!</div>';
+    } else {
+      list.innerHTML = bookings.slice(-10).reverse().map(b => `
+        <div class="stat-booking-row">
+          <span class="stat-booking-name">${b.name}</span>
+          <span class="stat-booking-service">${b.service !== '—' ? b.service : b.type === 'callback' ? 'Звонок' : 'Запись'}</span>
+          <span class="stat-booking-date">${b.date !== '—' ? b.date : new Date(b.createdAt).toLocaleDateString('ru-RU')}</span>
+        </div>
+      `).join('');
+    }
+  } catch { /* silent */ }
+}
 
 /* ── Mobile burger ─────────────────────────────────────────── */
 const mobileBurger = document.getElementById('mobile-burger');

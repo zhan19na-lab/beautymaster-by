@@ -69,8 +69,11 @@
       </p>
       <div class="hero-actions reveal reveal--delay-3">
         <a href="#registration" class="btn btn--gold">
-          <span>Получить свою страницу</span>
+          <span>Запустить свой сайт сейчас</span>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#hot-offer" class="btn btn--gold">
+          🔥 Специальное предложение
         </a>
         <a href="pages/master-profile.html" class="btn btn--ghost" target="_blank">
           Посмотреть демо страницу
@@ -356,15 +359,15 @@
         <div class="hot-feature">
           <span class="hot-feature-icon">💰</span>
           <div>
-            <strong>от 250 BYN</strong>
-            <span>вместо от 500 BYN</span>
+            <strong>от <span class="price" data-byn="300">300</span> <span class="currency">BYN</span></strong>
+            <span>вместо от <span class="price" data-byn="500">500</span> <span class="currency">BYN</span></span>
           </div>
         </div>
       </div>
       <div class="hot-offer-price-block">
-        <div class="hot-price-old">от 500 BYN</div>
-        <div class="hot-price-new">от 250 <span>BYN</span></div>
-        <a href="#registration" class="hot-offer-btn">
+        <div class="hot-price-old">от <span class="price" data-byn="500">500</span> <span class="currency">BYN</span></div>
+        <div class="hot-price-new">от <span class="price" data-byn="300">300</span> <span class="currency">BYN</span></div>
+        <a href="#registration" class="hot-offer-btn" id="vip-offer-btn">
           Хочу со скидкой 50%
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </a>
@@ -387,7 +390,7 @@
       <!-- Hot offer callout in pricing -->
       <div class="pricing-hot-callout reveal">
         <span class="hot-fire-sm">🔥</span>
-        <span>Горячее предложение: создание под ключ всего <strong>от 250 BYN</strong> — скидка 50% если начинаешь без триала</span>
+        <span>Горячее предложение: создание под ключ всего <strong>от <span class="price" data-byn="300">300</span> <span class="currency">BYN</span></strong> — без триала, сразу под ключ</span>
         <a href="#hot-offer">Подробнее →</a>
       </div>
 
@@ -397,8 +400,8 @@
           <div class="pricing-card-label">Создание</div>
           <div class="pricing-price">
             <span class="pricing-from">от</span>
-            <span class="pricing-amount">500</span>
-            <span class="pricing-currency">BYN</span>
+            <span class="pricing-amount price" data-byn="500">500</span>
+            <span class="pricing-currency currency">BYN</span>
           </div>
           <p class="pricing-note">Рассчитывается индивидуально в зависимости от ваших пожеланий</p>
           <ul class="pricing-features">
@@ -418,8 +421,8 @@
           <div class="pricing-card-label">Сопровождение</div>
           <div class="pricing-price">
             <span class="pricing-from">от</span>
-            <span class="pricing-amount">25</span>
-            <span class="pricing-currency">BYN<small>/мес</small></span>
+            <span class="pricing-amount price" data-byn="25">25</span>
+            <span class="pricing-currency currency">BYN<small>/мес</small></span>
           </div>
           <p class="pricing-note">После создания. Страница работает и принимает клиентов</p>
           <ul class="pricing-features">
@@ -461,7 +464,7 @@
       <div class="section-header reveal">
         <span class="section-tag">04 / Старт</span>
         <h2 class="section-title">Получи свою страницу</h2>
-        <p class="section-sub">Одна минута — и ты внутри. Триал 21 день, никаких обязательств.</p>
+        <p class="section-sub"></p>
       </div>
 
       <div class="reg-form-wrap reveal">
@@ -486,13 +489,17 @@
           </div>
           <div class="form-group">
             <label class="form-label">Номер телефона</label>
-            <input type="tel" class="form-input" id="reg-contact" placeholder="+375 XX XXX-XX-XX" />
+            <input type="tel" class="form-input" id="reg-contact" placeholder="+375 (BY) или +7 (RU/KZ)" />
           </div>
           <div class="form-group">
             <label class="form-label">Ник в Telegram <span style="color:var(--gold)">*</span></label>
             <input type="text" class="form-input" id="reg-tg" placeholder="@ваш_ник" autocomplete="off" />
             <p class="form-tg-hint">Напишите боту <a href="https://t.me/Beauty88888_bot" target="_blank">@Beauty88888_bot</a> команду <strong>/start</strong> — чтобы бот мог прислать вам вашу страницу</p>
           </div>
+          <label class="form-consent">
+            <input type="checkbox" id="reg-consent" required/>
+            <span>Я согласна на обработку персональных данных в соответствии с <a href="/privacy" target="_blank">Политикой конфиденциальности</a></span>
+          </label>
           <button type="submit" class="btn btn--gold btn--full">
             <span>Получить мою страницу</span>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -525,8 +532,9 @@
         <a href="#directions">Для мастеров</a>
         <a href="#registration">Контакты</a>
         <a href="pages/master-profile.html" target="_blank">Демо</a>
+        <a href="/privacy" target="_blank">Политика конфиденциальности</a>
       </nav>
-      <div class="footer-copy">© 2025 BeautyMaster.by — Все права защищены</div>
+      <div class="footer-copy">© 2026 BeautyMaster.by — Все права защищены</div>
     </div>
   </footer>
 

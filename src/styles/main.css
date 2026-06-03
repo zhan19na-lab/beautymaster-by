@@ -94,7 +94,7 @@ button { cursor: pointer; border: none; background: none; font: inherit; }
   font-size: 0.82rem;
   font-weight: 400;
   letter-spacing: 0.08em;
-  color: var(--muted);
+  color: var(--cream);
   text-transform: uppercase;
   transition: color 0.25s;
 }
@@ -102,7 +102,7 @@ button { cursor: pointer; border: none; background: none; font: inherit; }
 
 .nav-link-dash {
   font-size: 0.82rem !important;
-  color: rgba(245,240,232,0.5) !important;
+  color: var(--cream) !important;
   letter-spacing: 0.06em;
 }
 .nav-link-dash:hover { color: var(--cream) !important; }
@@ -1062,7 +1062,7 @@ button { cursor: pointer; border: none; background: none; font: inherit; }
 .trial-title em { font-style: italic; color: var(--gold); }
 .trial-sub {
   font-size: 1rem;
-  color: var(--muted);
+  color: var(--cream);
   margin-top: 12px;
   font-weight: 300;
 }
@@ -1093,7 +1093,7 @@ button { cursor: pointer; border: none; background: none; font: inherit; }
   font-size: 0.74rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--cream);
 }
 .form-input {
   background: rgba(255,255,255,0.03);
@@ -1122,15 +1122,20 @@ button { cursor: pointer; border: none; background: none; font: inherit; }
 }
 .form-select option { background: #1a1a1a; color: var(--cream); }
 
+.form-consent { display: flex; align-items: flex-start; gap: 10px; cursor: pointer; margin-bottom: 4px; }
+.form-consent input { margin-top: 3px; accent-color: #C9A96E; flex-shrink: 0; }
+.form-consent span { font-size: 0.82rem; color: #c8bfb0; line-height: 1.5; }
+.form-consent a { color: #C9A96E; text-decoration: underline; }
+
 .form-disclaimer {
   text-align: center;
   font-size: 0.74rem;
-  color: var(--muted);
+  color: var(--cream);
   letter-spacing: 0.05em;
 }
 .form-tg-hint {
   font-size: 0.78rem;
-  color: rgba(245,240,232,0.55);
+  color: var(--cream);
   margin-top: 8px;
   line-height: 1.6;
 }
@@ -1208,7 +1213,7 @@ button { cursor: pointer; border: none; background: none; font: inherit; }
   margin-bottom: 8px;
 }
 .footer-logo span { color: var(--gold); }
-.footer-tagline { font-size: 0.8rem; color: var(--muted); max-width: 300px; }
+.footer-tagline { font-size: 0.8rem; color: var(--cream); max-width: 300px; }
 .footer-nav {
   display: flex;
   flex-direction: column;
@@ -1217,13 +1222,13 @@ button { cursor: pointer; border: none; background: none; font: inherit; }
 }
 .footer-nav a {
   font-size: 0.82rem;
-  color: var(--muted);
+  color: var(--cream);
   transition: color 0.25s;
 }
 .footer-nav a:hover { color: var(--gold); }
 .footer-copy {
   font-size: 0.75rem;
-  color: var(--muted-2);
+  color: var(--cream);
   grid-column: 1 / -1;
   padding-top: 20px;
   border-top: 1px solid rgba(255,255,255,0.05);

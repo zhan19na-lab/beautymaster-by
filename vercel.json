@@ -1,6 +1,12 @@
 {
   "version": 2,
   "name": "beautymaster-by",
+  "crons": [
+    {
+      "path": "/api/cron-check-trials",
+      "schedule": "0 7 * * *"
+    }
+  ],
   "redirects": [
     { "source": "/index.html", "destination": "/", "permanent": true }
   ],
@@ -8,6 +14,10 @@
     { "source": "/master/:slug", "destination": "/src/master.html" },
     { "source": "/master.js",    "destination": "/src/master.js" },
     { "source": "/master.css",   "destination": "/src/master.css" },
+    { "source": "/admin", "destination": "/src/pages/admin.html" },
+    { "source": "/privacy", "destination": "/src/pages/privacy.html" },
+    { "source": "/anketa", "destination": "/src/pages/anketa.html" },
+    { "source": "/oplata", "destination": "/src/pages/oplata.html" },
     { "source": "/pages/:path*", "destination": "/src/pages/:path*" },
     { "source": "/styles/:path*","destination": "/src/styles/:path*" },
     { "source": "/js/:path*",    "destination": "/src/js/:path*" },

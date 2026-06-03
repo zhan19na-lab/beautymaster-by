@@ -228,7 +228,7 @@ function isValidName(val) {
       showError('reg-contact', 'Введите номер телефона');
       valid = false;
     } else if (!isValidPhone(contact)) {
-      showError('reg-contact', 'Формат: +375XXXXXXXXX (с плюсом, 11-12 цифр)');
+      showError('reg-contact', 'Формат: +375XXXXXXXXX или +7XXXXXXXXXX (с плюсом, 11-12 цифр)');
       valid = false;
     }
     if (!tg) {
@@ -245,18 +245,38 @@ function isValidName(val) {
     btn.disabled = true;
     btn.innerHTML = '<span>Создаём страницу...</span>';
 
+    const isVip = new URLSearchParams(window.location.search).get('source') === 'vip'
+      || sessionStorage.getItem('reg_source') === 'vip';
+
     fetch('/api/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, direction: dir, contact, tgUsername: tg })
+      body: JSON.stringify({ name, direction: dir, contact, tgUsername: tg, isVip })
     })
-      .catch(() => {})
-      .finally(() => {
-        form.style.display = 'none';
-        success.style.display = 'flex';
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          sessionStorage.removeItem('reg_source');
+          form.style.display = 'none';
+          success.style.display = 'flex';
+        } else {
+          btn.disabled = false;
+          btn.innerHTML = '<span>Получить страницу бесплатно →</span>';
+          alert('Ошибка отправки. Попробуйте ещё раз.');
+        }
+      })
+      .catch(() => {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Получить страницу бесплатно →</span>';
+        alert('Ошибка соединения. Попробуйте ещё раз.');
       });
   });
 })();
+
+/* ── VIP offer button ─────────────────────────────────────── */
+document.getElementById('vip-offer-btn')?.addEventListener('click', () => {
+  sessionStorage.setItem('reg_source', 'vip');
+});
 
 /* ── Smooth scroll for anchor links ───────────────────────── */
 document.querySelectorAll('a[href^="#"]').forEach(a => {
@@ -272,3 +292,38 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     }
   });
 });
+
+/* ── Currency by geo ───────────────────────────────────────── */
+(async function initCurrency() {
+  const RATES = {
+    BY: { code: 'BYN', symbol: 'BYN', rate: 1,   round: 1 },
+    RU: { code: 'RUB', symbol: 'руб', rate: 30,  round: 100 },
+    KZ: { code: 'KZT', symbol: '₸',   rate: 150, round: 500 },
+    UA: { code: 'UAH', symbol: '₴',   rate: 40,  round: 100 },
+  };
+
+  function applyRates(country) {
+    const cfg = RATES[country] || RATES.BY;
+    if (cfg.rate === 1) return; // BYN — ничего не меняем
+
+    document.querySelectorAll('.price[data-byn]').forEach(el => {
+      const byn = parseInt(el.dataset.byn);
+      const converted = Math.round((byn * cfg.rate) / cfg.round) * cfg.round;
+      el.textContent = converted.toLocaleString('ru-RU');
+    });
+
+    document.querySelectorAll('.currency').forEach(el => {
+      const small = el.querySelector('small');
+      el.textContent = cfg.symbol;
+      if (small) el.appendChild(small);
+    });
+  }
+
+  try {
+    const res = await fetch('https://ip-api.com/json/?fields=countryCode');
+    const data = await res.json();
+    applyRates(data.countryCode || 'BY');
+  } catch {
+    // Если геолокация недоступна — остаётся BYN
+  }
+})();

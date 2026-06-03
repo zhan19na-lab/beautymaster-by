@@ -602,6 +602,22 @@ img { max-width: 100%; display: block; }
 .thumb-caption:focus { border-color: var(--gold-border); color: var(--cream); }
 .portfolio-hint { font-size: 0.75rem; color: var(--muted); }
 
+/* ── STATS ───────────────────────────────────────────────── */
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 8px; }
+.stat-card { background: var(--bg-card); border: 1px solid var(--gold-border); border-radius: 12px; padding: 24px 16px; text-align: center; }
+.stat-icon { font-size: 1.6rem; margin-bottom: 10px; }
+.stat-num { font-size: 2rem; color: var(--gold); font-family: var(--font-heading); margin-bottom: 6px; }
+.stat-label { font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.stat-bookings-title { font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+.stat-bookings-list { display: flex; flex-direction: column; gap: 12px; }
+.stat-booking-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--gold-border); font-size: 0.9rem; }
+.stat-booking-row:last-child { border-bottom: none; }
+.stat-booking-name { color: var(--cream); }
+.stat-booking-service { color: var(--muted); font-style: italic; }
+.stat-booking-date { color: var(--gold); font-size: 0.8rem; }
+.stat-empty { color: var(--muted); font-style: italic; text-align: center; padding: 24px 0; }
+@media (max-width: 600px) { .stats-grid { grid-template-columns: 1fr; } }
+
 /* ── TOAST ───────────────────────────────────────────────── */
 .toast {
   position: fixed;

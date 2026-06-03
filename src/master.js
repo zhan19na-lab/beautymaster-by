@@ -78,11 +78,6 @@ function renderPage(d) {
       <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.78a4.86 4.86 0 01-1.01-.09z"/></svg>
     </a>`;
   }
-  if (d.phone) {
-    socials.innerHTML += `<a href="https://wa.me/${d.phone.replace(/[^0-9]/g,'')}" class="social-btn social-btn--wa" target="_blank" aria-label="WhatsApp">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.29-.14-1.72-.85-1.99-.95-.27-.1-.47-.14-.67.14-.2.28-.78.95-.96 1.14-.18.2-.35.22-.64.07-.29-.14-1.23-.45-2.34-1.45-.86-.77-1.45-1.72-1.62-2.01-.17-.29-.02-.45.13-.59.13-.12.29-.32.44-.48.15-.16.2-.27.29-.45.1-.18.05-.34-.02-.48-.07-.14-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51-.17-.01-.37-.01-.57-.01-.2 0-.52.07-.79.34-.27.27-1.04 1.01-1.04 2.47 0 1.46 1.06 2.87 1.21 3.07.15.2 2.09 3.19 5.07 4.47.71.31 1.26.49 1.69.63.71.23 1.36.19 1.87.12.57-.09 1.75-.72 2-1.41.25-.69.25-1.28.17-1.41-.08-.12-.27-.19-.57-.33z"/><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l5.09-1.34C8.5 21.51 10.22 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.67 0-3.22-.48-4.53-1.31l-.32-.19-3.02.79.81-2.96-.21-.34C3.49 14.97 3 13.54 3 12c0-4.97 4.03-9 9-9s9 4.03 9 9-4.03 9-9 9z"/></svg>
-    </a>`;
-  }
 
   // Services list
   const services = d.services || [];
@@ -114,8 +109,6 @@ function renderPage(d) {
   if (d.phone) {
     document.getElementById('contact-phone-block').style.display = 'flex';
     document.getElementById('contact-phone').textContent = d.phone;
-    document.getElementById('contact-wa-block').style.display = 'block';
-    document.getElementById('contact-wa-link').href = `https://wa.me/${d.phone.replace(/[^0-9]/g,'')}`;
   }
 
   // Schedule / hours table
@@ -749,6 +742,35 @@ async function initOwnerMode() {
       '<div style="text-align:center;padding:40px;"><p style="color:var(--muted);">Страница не найдена</p><a href="/" style="color:var(--gold);margin-top:16px;display:block;">← На главную</a></div>';
     return;
   }
-  renderPage(data);
-  initOwnerMode();
+
+  // Check if subscription expired (only for non-owners)
+  const urlToken = new URLSearchParams(window.location.search).get('token');
+  const isOwner = urlToken && data.editToken === urlToken;
+
+  if (data.isExpired && !isOwner) {
+    const phone = data.phone || '';
+    document.getElementById('page-loading').innerHTML = `
+      <div style="text-align:center;padding:80px 24px;max-width:480px;margin:0 auto;">
+        <div style="font-size:2.5rem;margin-bottom:20px;">🌸</div>
+        <h2 style="font-size:1.6rem;font-weight:400;color:#F5F0E8;margin-bottom:12px;">${data.name || 'Мастер'}</h2>
+        <p style="color:#C9A96E;font-size:1rem;margin-bottom:8px;">${data.specialty || ''}</p>
+        <div style="width:40px;height:1px;background:#C9A96E;margin:20px auto;"></div>
+        <p style="color:#8a7a6a;font-style:italic;line-height:1.7;margin-bottom:28px;">
+          Страница временно на обслуживании.<br/>
+          Для записи свяжитесь с мастером напрямую.
+        </p>
+        ${phone ? `<a href="tel:${phone}" style="display:inline-block;padding:14px 32px;background:#C9A96E;color:#0a0a0a;border-radius:8px;text-decoration:none;font-size:1rem;letter-spacing:0.05em;">${phone}</a>` : ''}
+        <div style="margin-top:32px;"><a href="/" style="color:#4a3a2a;font-size:0.8rem;">BeautyMaster.by</a></div>
+      </div>`;
+    return;
+  }
+
+  try {
+    renderPage(data);
+  } catch(err) {
+    console.error('renderPage error:', err);
+    document.getElementById('page-loading').style.display = 'none';
+    document.getElementById('page-content').style.display = 'block';
+  }
+  await initOwnerMode();
 })();

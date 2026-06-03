@@ -2,33 +2,25 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  const { name, direction, answers } = req.body || {};
+  if (!name || !answers) return res.status(400).json({ error: 'Missing fields' });
 
   const token  = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
   if (!token || !chatId) return res.status(500).json({ error: 'Bot not configured' });
 
-  const { type, name, direction, contact, name: clientName } = req.body || {};
+  const lines = answers.map((a, i) => `<i>${i + 1}. ${a.question}</i>\n<b>→ ${a.answer || '—'}</b>`).join('\n\n');
 
-  let text = '';
-
-  if (type === 'oplata') {
-    // Payment confirmation
-    if (!clientName) return res.status(400).json({ error: 'Missing name' });
-    text = `💳 <b>ОПЛАТА ПОЛУЧЕНА!</b>\n\n👤 <b>${clientName}</b> подтвердил(а) оплату предоплаты 150 BYN.\n\n✅ Свяжитесь с клиентом и приступайте к работе!`;
-  } else {
-    // Booking notification
-    if (!name || !direction || !contact) return res.status(400).json({ error: 'Missing fields' });
-    text = `🌸 <b>Новая заявка!</b>\n\n👤 <b>Имя:</b> ${name}\n💅 <b>Направление:</b> ${direction}\n📞 <b>Контакт:</b> ${contact}`;
-  }
+  const text = `📋 <b>Анкета заполнена!</b>\n\n👤 <b>${name}</b> · ${direction}\n\n${lines}`;
 
   try {
     const tgRes = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' })
+      body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML', disable_web_page_preview: true })
     });
     const data = await tgRes.json();
     if (!data.ok) return res.status(500).json({ error: 'Telegram error', details: data });

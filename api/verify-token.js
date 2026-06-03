@@ -9,20 +9,27 @@ export default async function handler(req, res) {
   if (!blobToken) return res.status(500).json({ valid: false });
 
   const listRes = await fetch(
-    `https://blob.vercel-storage.com/?prefix=masters/${slug}&limit=1`,
-    { headers: { Authorization: `Bearer ${blobToken}` } }
+    `https://blob.vercel-storage.com/?prefix=masters/${slug}&limit=10&_=${Date.now()}`,
+    { headers: { Authorization: `Bearer ${blobToken}`, 'Cache-Control': 'no-cache' } }
   );
-  if (!listRes.ok) return res.status(500).json({ valid: false });
+  if (!listRes.ok) return res.status(500).json({ valid: false, step: 'list' });
 
   const list = await listRes.json();
-  const blob = list.blobs?.[0];
-  if (!blob) return res.status(404).json({ valid: false });
+  const blobs = list.blobs || [];
+  if (!blobs.length) return res.status(404).json({ valid: false, step: 'no-blob' });
 
-  const fetchUrl = blob.downloadUrl || blob.url;
-  const dataRes = await fetch(fetchUrl, { headers: { Authorization: `Bearer ${blobToken}` } });
-  if (!dataRes.ok) return res.status(500).json({ valid: false });
+  // Try each blob (newest first) until we find matching token
+  for (const blob of blobs) {
+    try {
+      const fetchUrl = blob.downloadUrl || blob.url;
+      const dataRes = await fetch(fetchUrl, {
+        headers: { Authorization: `Bearer ${blobToken}`, 'Cache-Control': 'no-cache' }
+      });
+      if (!dataRes.ok) continue;
+      const data = await dataRes.json();
+      if (data.editToken === token) return res.status(200).json({ valid: true });
+    } catch { continue; }
+  }
 
-  const data = await dataRes.json();
-  const valid = data.editToken === token;
-  return res.status(200).json({ valid });
+  return res.status(200).json({ valid: false, step: 'token-mismatch' });
 }

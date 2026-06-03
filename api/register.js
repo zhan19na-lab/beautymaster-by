@@ -90,7 +90,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { name, direction, contact, tgUsername } = req.body || {};
+  const { name, direction, contact, tgUsername, isVip } = req.body || {};
   if (!name || !direction || !contact || !tgUsername) return res.status(400).json({ error: 'Missing fields' });
 
   // Server-side validation
@@ -118,7 +118,7 @@ export default async function handler(req, res) {
     const masterData = {
       slug, name: nameFixed, specialty: direction, phone: contact, editToken,
       tgUsername: tgUsername?.replace('@','') || '',
-      city: 'Беларусь',
+      city: '',
       bio: '',
       services: getServices(direction),
       schedule: {
@@ -149,13 +149,19 @@ export default async function handler(req, res) {
   // Notify admin
   if (token && adminId) {
     const tgInfo = tgUsername ? `\n📱 <b>Telegram:</b> @${tgUsername.replace('@','')}` : '';
+    const vipHeader = isVip
+      ? `🔴🔴🔴 <b>VIP — ГОРЯЧАЯ ЗАЯВКА СО СКИДКОЙ 50%!</b> 🔴🔴🔴\n\n`
+      : `🌸 <b>Новая регистрация мастера!</b>\n\n`;
     await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         chat_id: adminId,
-        text: `🌸 <b>Новая регистрация мастера!</b>\n\n👤 <b>Имя:</b> ${name}\n💅 <b>Направление:</b> ${direction}\n📞 <b>Контакт:</b> ${contact}${tgInfo}\n\n🔗 <b>Страница:</b> ${pageUrl}`,
-        parse_mode: 'HTML'
+        text: isVip
+          ? `${vipHeader}👤 <b>Имя:</b> ${name}\n💅 <b>Направление:</b> ${direction}\n📞 <b>Контакт:</b> ${contact}${tgInfo}\n\n📋 <b>Анкета:</b> https://beautymaster-by.vercel.app/anketa?slug=${slug}\n🔗 <b>Страница:</b> ${pageUrl}`
+          : `${vipHeader}👤 <b>Имя:</b> ${name}\n💅 <b>Направление:</b> ${direction}\n📞 <b>Контакт:</b> ${contact}${tgInfo}\n\n🔗 <b>Страница:</b> ${pageUrl}`,
+        parse_mode: 'HTML',
+        disable_web_page_preview: true
       })
     }).catch(() => {});
   }
@@ -165,14 +171,17 @@ export default async function handler(req, res) {
     const clean = tgUsername.replace('@','').toUpperCase().replace(/[^A-Z0-9]/g,'_');
     const masterChatId = process.env[`MASTER_${clean}`];
     if (masterChatId) {
+      const replyText = isVip
+        ? `🌸 <b>${nameFixed}, ваша заявка принята!</b>\n\n<i>Спасибо за доверие — для меня это очень важно.</i>\n\n<i>Я лично свяжусь с вами в ближайшее время, и мы в тёплой беседе обсудим каждую деталь.</i>\n\n<i>Ваше приложение будет создано</i> <b>под ключ</b> <i>— красиво, профессионально и именно так, как вы мечтаете.</i>\n\n<i>До скорой встречи!</i> 🤍\n\n🌸 <b>Давайте создадим что-то по-настоящему ваше!</b>\n<i>Заполните короткую анкету — это займёт 3 минуты и поможет мне подготовиться:</i>\n\nhttps://beautymaster-by.vercel.app/anketa?slug=${slug}`
+        : `✅ <b>Заявка получена, ${nameFixed}!</b>\n\n🎉 Ваша страница уже готова — настройте её прямо сейчас.\n\n🔗 <b>Ваша личная ссылка для редактирования:</b>\n${editUrl}\n\n⚠️ Эту ссылку никому не передавайте — по ней можно изменять ваш профиль.\n\n👁 <b>Публичная ссылка для клиентов:</b>\n${pageUrl}\n\nПоделитесь публичной ссылкой в Instagram, TikTok и WhatsApp — клиенты смогут записаться онлайн.`;
       await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           chat_id: masterChatId,
-          text: `✅ <b>Заявка получена, ${nameFixed}!</b>\n\n🎉 Ваша страница уже готова — настройте её прямо сейчас.\n\n🔗 <b>Ваша личная ссылка для редактирования:</b>\n${editUrl}\n\n⚠️ Эту ссылку никому не передавайте — по ней можно изменять ваш профиль.\n\n👁 <b>Публичная ссылка для клиентов:</b>\n${pageUrl}\n\nПоделитесь публичной ссылкой в Instagram, TikTok и WhatsApp — клиенты смогут записаться онлайн.`,
+          text: replyText,
           parse_mode: 'HTML',
-          disable_web_page_preview: false
+          disable_web_page_preview: true
         })
       }).catch(() => {});
     }

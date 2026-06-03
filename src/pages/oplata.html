@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Оплата — BeautyMaster.by</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0a0a0a; color: #F5F0E8; font-family: 'Cormorant Garamond', Georgia, serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .wrap { max-width: 520px; width: 100%; text-align: center; }
+    .logo { font-size: 0.85rem; letter-spacing: 0.2em; color: #E8D5B0; text-transform: uppercase; margin-bottom: 48px; }
+    .logo span { color: #C9A96E; }
+    .star { font-size: 2rem; margin-bottom: 20px; }
+    h1 { font-size: 2rem; font-weight: 400; margin-bottom: 10px; line-height: 1.2; }
+    .sub { font-style: italic; color: #8a7a6a; font-size: 1rem; margin-bottom: 40px; }
+    .card-block {
+      background: #141414; border: 1px solid #2a2a2a; border-radius: 12px;
+      padding: 32px; margin-bottom: 32px;
+    }
+    .card-label { font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: #C9A96E; margin-bottom: 16px; }
+    .card-number {
+      font-size: 1.6rem; letter-spacing: 0.12em; color: #F5F0E8;
+      margin-bottom: 8px; font-weight: 400;
+    }
+    .card-bank { font-size: 0.85rem; color: #6a5a4a; margin-bottom: 20px; }
+    .amount-block { background: rgba(201,169,110,0.08); border: 1px solid rgba(201,169,110,0.3); border-radius: 8px; padding: 16px; margin-bottom: 20px; }
+    .amount-label { font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: #C9A96E; margin-bottom: 6px; }
+    .amount { font-size: 2.2rem; color: #C9A96E; }
+    .amount span { font-size: 1rem; }
+    .copy-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: none; border: 1px solid #2a2a2a; color: #8a7a6a;
+      padding: 10px 20px; border-radius: 6px; cursor: pointer;
+      font-family: inherit; font-size: 0.85rem; transition: all 0.2s;
+    }
+    .copy-btn:hover { border-color: #C9A96E; color: #C9A96E; }
+    .copy-btn.copied { border-color: #4a9a6a; color: #4a9a6a; }
+    .steps { text-align: left; margin-bottom: 32px; }
+    .steps-title { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: #C9A96E; margin-bottom: 16px; }
+    .step { display: flex; gap: 14px; margin-bottom: 14px; align-items: flex-start; }
+    .step-num { width: 26px; height: 26px; border: 1px solid #C9A96E; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #C9A96E; flex-shrink: 0; margin-top: 1px; }
+    .step-text { font-size: 0.95rem; color: #E8D5B0; line-height: 1.5; font-style: italic; }
+    .confirm-btn {
+      width: 100%; padding: 16px; background: #C9A96E; color: #0a0a0a;
+      border: none; border-radius: 8px; font-family: inherit; font-size: 1rem;
+      letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer;
+      transition: opacity 0.2s; margin-bottom: 16px;
+    }
+    .confirm-btn:hover { opacity: 0.88; }
+    .confirm-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .note { font-size: 0.8rem; color: #4a3a2a; font-style: italic; }
+    .success { display: none; text-align: center; padding: 40px 0; }
+    .success .star { font-size: 3rem; }
+    .success h2 { font-size: 1.6rem; font-weight: 400; color: #C9A96E; margin-bottom: 12px; }
+    .success p { color: #8a7a6a; font-style: italic; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">BEAUTY<span>MASTER</span>.BY</div>
+
+  <div id="pay-block">
+    <div class="star">🌸</div>
+    <h1>Предоплата за создание сайта</h1>
+    <p class="sub">Переведите сумму на карту — и я сразу приступлю к работе</p>
+
+    <div class="card-block">
+      <div class="card-label">Номер карты для перевода</div>
+      <div class="card-number" id="card-num">9112 3880 5242 1489</div>
+      <div class="card-bank">Сбербанк · Жанна</div>
+      <div class="amount-block">
+        <div class="amount-label">Сумма предоплаты</div>
+        <div class="amount">100 <span>BYN</span></div>
+      </div>
+      <button class="copy-btn" id="copy-btn" onclick="copyCard()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        Скопировать номер карты
+      </button>
+    </div>
+
+    <div class="steps">
+      <div class="steps-title">Как перевести</div>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">Откройте приложение вашего банка и выберите "Перевод по номеру карты"</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">Введите номер карты: <strong>9112 3880 5242 1489</strong> и сумму 150 BYN</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">После перевода нажмите кнопку ниже — я получу уведомление и свяжусь с вами</div>
+      </div>
+    </div>
+
+    <button class="confirm-btn" id="confirm-btn" onclick="confirmPayment()">
+      ✅ Я перевела деньги — сообщить об оплате
+    </button>
+    <p class="note">После подтверждения мы свяжемся с вами в течение 2 часов</p>
+  </div>
+
+  <div class="success" id="success-block">
+    <div class="star">🎉</div>
+    <h2>Спасибо за оплату!</h2>
+    <p>Уведомление отправлено.<br/>Я свяжусь с вами в ближайшее время — начнём создавать ваш сайт!</p>
+  </div>
+</div>
+
+<script>
+function copyCard() {
+  navigator.clipboard.writeText('9112388052421489').then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.classList.add('copied');
+    btn.innerHTML = '✓ Скопировано!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> Скопировать номер карты';
+    }, 2500);
+  });
+}
+
+async function confirmPayment() {
+  const btn = document.getElementById('confirm-btn');
+  btn.disabled = true;
+  btn.textContent = 'Отправляем...';
+
+  const params = new URLSearchParams(window.location.search);
+  const name = params.get('name') || 'Клиент';
+
+  try {
+    const res = await fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'oplata', name })
+    });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('pay-block').style.display = 'none';
+      document.getElementById('success-block').style.display = 'block';
+    } else {
+      btn.disabled = false;
+      btn.textContent = '✅ Я оплатил(а) — уведомить мастера';
+      alert('Ошибка. Попробуйте ещё раз.');
+    }
+  } catch {
+    btn.disabled = false;
+    btn.textContent = '✅ Я оплатил(а) — уведомить мастера';
+    alert('Ошибка соединения. Попробуйте ещё раз.');
+  }
+}
+</script>
+</body>
+</html>

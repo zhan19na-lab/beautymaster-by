@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Анкета мастера — BeautyMaster.by</title>
+  <link rel="stylesheet" href="/styles/main.css"/>
+  <style>
+    body { background: #0a0a0a; color: #F5F0E8; font-family: 'Cormorant Garamond', Georgia, serif; min-height: 100vh; }
+    .anketa-wrap { max-width: 640px; margin: 0 auto; padding: 48px 24px 80px; }
+    .anketa-logo { font-size: 1rem; letter-spacing: 0.15em; color: #E8D5B0; margin-bottom: 40px; text-transform: uppercase; }
+    .anketa-logo span { color: #C9A96E; }
+    .anketa-title { font-size: 2rem; font-weight: 400; color: #F5F0E8; margin-bottom: 8px; line-height: 1.2; }
+    .anketa-sub { font-size: 1rem; color: #8a7a6a; font-style: italic; margin-bottom: 40px; }
+    .anketa-block { margin-bottom: 36px; }
+    .anketa-block-title { font-size: 0.8rem; letter-spacing: 0.12em; text-transform: uppercase; color: #C9A96E; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+    .anketa-field { margin-bottom: 24px; }
+    .anketa-label { display: block; font-size: 0.95rem; color: #E8D5B0; margin-bottom: 8px; font-style: italic; }
+    .anketa-label .hint { display: block; font-size: 0.82rem; color: #c8bfb0; margin-top: 4px; font-style: normal; }
+    .anketa-input, .anketa-textarea, .anketa-select {
+      width: 100%; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 8px;
+      color: #F5F0E8; font-family: inherit; font-size: 0.95rem; padding: 12px 16px;
+      box-sizing: border-box; transition: border-color 0.2s;
+    }
+    .anketa-input:focus, .anketa-textarea:focus, .anketa-select:focus {
+      outline: none; border-color: #C9A96E;
+    }
+    .anketa-textarea { resize: vertical; min-height: 90px; }
+    .anketa-select { appearance: none; cursor: pointer; }
+    .anketa-options { display: flex; flex-wrap: wrap; gap: 10px; }
+    .anketa-option { cursor: pointer; }
+    .anketa-option input { display: none; }
+    .anketa-option span {
+      display: block; padding: 8px 16px; border: 1px solid #2a2a2a; border-radius: 20px;
+      font-size: 0.9rem; color: #8a7a6a; transition: all 0.2s;
+    }
+    .anketa-option input:checked + span { border-color: #C9A96E; color: #C9A96E; background: rgba(201,169,110,0.08); }
+    .anketa-btn {
+      width: 100%; padding: 16px; background: #C9A96E; color: #0a0a0a;
+      border: none; border-radius: 8px; font-family: inherit; font-size: 1rem;
+      letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: opacity 0.2s;
+      margin-top: 8px;
+    }
+    .anketa-btn:hover { opacity: 0.88; }
+    .anketa-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .anketa-success { text-align: center; padding: 60px 24px; }
+    .anketa-success .star { font-size: 2.5rem; margin-bottom: 20px; }
+    .anketa-success h2 { font-size: 1.8rem; font-weight: 400; color: #C9A96E; margin-bottom: 12px; }
+    .anketa-success p { color: #8a7a6a; font-style: italic; font-size: 1rem; }
+  </style>
+</head>
+<body>
+<div class="anketa-wrap">
+  <div class="anketa-logo">BEAUTY<span>MASTER</span>.BY</div>
+
+  <div id="anketa-form-wrap">
+    <h1 class="anketa-title" id="anketa-title">Анкета мастера</h1>
+    <p class="anketa-sub" id="anketa-sub">Расскажите о себе — это поможет создать приложение именно для вас</p>
+
+    <form id="anketa-form">
+      <!-- Блок 1: Стиль -->
+      <div class="anketa-block">
+        <div class="anketa-block-title">📍 Блок 1: Ваш стиль</div>
+
+        <div class="anketa-field">
+          <label class="anketa-label">Instagram, TikTok или Telegram-канал?
+            <span class="hint">Ссылка или @ник</span>
+          </label>
+          <input class="anketa-input" name="socials" type="text" placeholder="@mypage или ссылка"/>
+        </div>
+
+        <div class="anketa-field">
+          <label class="anketa-label">В каком стиле хотите приложение?</label>
+          <div class="anketa-options" id="style-options">
+            <label class="anketa-option"><input type="radio" name="style" value="Нежный / женственный"/><span>🌸 Нежный</span></label>
+            <label class="anketa-option"><input type="radio" name="style" value="Минимализм / строгий"/><span>◻️ Минимализм</span></label>
+            <label class="anketa-option"><input type="radio" name="style" value="Яркий / модный"/><span>✨ Яркий</span></label>
+            <label class="anketa-option"><input type="radio" name="style" value="Тёмный / премиум"/><span>🖤 Тёмный премиум</span></label>
+          </div>
+        </div>
+
+        <div class="anketa-field">
+          <label class="anketa-label">Какие цвета вам близки?
+            <span class="hint">Например: пудровые, бежевые, чёрно-золотые, яркие</span>
+          </label>
+          <input class="anketa-input" name="colors" type="text" placeholder="Ваши любимые цвета"/>
+        </div>
+
+        <div class="anketa-field">
+          <label class="anketa-label">Есть сайты, страницы или работы которые нравятся?
+            <span class="hint">Скиньте ссылки — это поможет понять ваш вкус</span>
+          </label>
+          <textarea class="anketa-textarea" name="refs" placeholder="Ссылки на вдохновение..."></textarea>
+        </div>
+      </div>
+
+      <!-- Блок 2: Услуги -->
+      <div class="anketa-block">
+        <div class="anketa-block-title" id="block2-title">💼 Блок 2: Услуги и контент</div>
+
+        <div class="anketa-field">
+          <label class="anketa-label" id="services-label">Какие услуги и цены указать?
+            <span class="hint">Можно текстом, списком или прислать прайс</span>
+          </label>
+          <textarea class="anketa-textarea" name="services" id="services-input" placeholder="Ваши услуги и цены..."></textarea>
+        </div>
+
+        <div class="anketa-field">
+          <label class="anketa-label" id="utp-label">Ваша фишка — что вас отличает от других?
+            <span class="hint" id="utp-hint"></span>
+          </label>
+          <textarea class="anketa-textarea" name="utp" placeholder="Ваше уникальное преимущество..."></textarea>
+        </div>
+
+        <div class="anketa-field">
+          <label class="anketa-label">Какие фото есть?</label>
+          <div class="anketa-options">
+            <label class="anketa-option"><input type="radio" name="photos" value="Профессиональные"/><span>📷 Профессиональные</span></label>
+            <label class="anketa-option"><input type="radio" name="photos" value="Телефонные"/><span>📱 Телефонные</span></label>
+            <label class="anketa-option"><input type="radio" name="photos" value="Нет пока"/><span>😅 Нет пока</span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Блок 3: Организация -->
+      <div class="anketa-block">
+        <div class="anketa-block-title">📅 Блок 3: Организация</div>
+
+        <div class="anketa-field">
+          <label class="anketa-label">Адрес студии или работаете на выезд?</label>
+          <input class="anketa-input" name="address" type="text" placeholder="Город, улица или 'работаю на выезд'"/>
+        </div>
+
+        <div class="anketa-field">
+          <label class="anketa-label">График работы?
+            <span class="hint">Например: Пн-Пт 10:00-20:00, Сб-Вс по записи</span>
+          </label>
+          <input class="anketa-input" name="schedule" type="text" placeholder="Ваш рабочий график"/>
+        </div>
+
+        <div class="anketa-field">
+          <label class="anketa-label">Как клиенты должны записываться?</label>
+          <div class="anketa-options">
+            <label class="anketa-option"><input type="radio" name="booking" value="Telegram"/><span>✈️ Telegram</span></label>
+            <label class="anketa-option"><input type="radio" name="booking" value="WhatsApp"/><span>💬 WhatsApp</span></label>
+            <label class="anketa-option"><input type="radio" name="booking" value="Онлайн-календарь"/><span>📅 Онлайн-календарь</span></label>
+            <label class="anketa-option"><input type="radio" name="booking" value="По телефону"/><span>📞 По телефону</span></label>
+          </div>
+        </div>
+
+        <div class="anketa-field">
+          <label class="anketa-label">Пожелания — что ещё важно учесть?
+            <span class="hint">Любые детали, идеи, особенности</span>
+          </label>
+          <textarea class="anketa-textarea" name="wishes" placeholder="Ваши пожелания..."></textarea>
+        </div>
+      </div>
+
+      <button type="submit" class="anketa-btn" id="anketa-submit">Отправить анкету →</button>
+    </form>
+  </div>
+
+  <div id="anketa-success" class="anketa-success" style="display:none">
+    <div class="star">🌸</div>
+    <h2>Анкета отправлена!</h2>
+    <p>Спасибо! Я изучу ваши ответы и свяжусь с вами в ближайшее время.</p>
+  </div>
+</div>
+
+<script>
+const HINTS_BY_DIRECTION = {
+  'Визаж': 'например: "делаю макияж за 45 минут", "работаю на профессиональной косметике MAC и NARS", "специализируюсь на свадебном макияже"',
+  'Маникюр': 'например: "маникюр за 1 час", "покрытие держится 4 недели", "работаю только на премиум-гель-лаках"',
+  'Брови': 'например: "исправляю чужие неудачные работы", "делаю брови за 30 минут", "работаю по авторской технике"',
+  'Ресницы': 'например: "наращивание за 1.5 часа", "ресницы держатся 4-6 недель", "использую корейские материалы"',
+  'Волосы': 'например: "колористика без повреждений", "стрижка с учётом типа лица", "специализируюсь на балаяже"',
+  'Косметология': 'например: "видимый результат с первой процедуры", "работаю только с сертифицированной косметикой"',
+  'Массаж': 'например: "расслабляющий массаж за 60 минут", "работаю с болями в спине", "выезжаю на дом"',
+  'Тату': 'например: "работаю в акварельной технике", "специализируюсь на миниатюрных тату", "перекрываю старые татуировки"',
+};
+
+const params = new URLSearchParams(window.location.search);
+const slug = params.get('slug') || '';
+let name = params.get('name') || '';
+let direction = params.get('direction') || '';
+
+async function initPage() {
+  if (slug) {
+    try {
+      const res = await fetch(`/api/get-master?slug=${slug}`);
+      const data = await res.json();
+      if (data.name) name = data.name;
+      if (data.specialty) direction = data.specialty;
+    } catch {}
+  }
+
+  document.getElementById('anketa-title').textContent = `Анкета для вас`;
+  document.getElementById('anketa-sub').textContent = direction
+    ? `Направление: ${direction} — расскажите о себе, чтобы мы создали приложение именно для вас`
+    : 'Расскажите о себе — это поможет создать приложение именно для вас';
+
+  if (direction) {
+    const key = Object.keys(HINTS_BY_DIRECTION).find(k => direction.includes(k));
+    if (key) document.getElementById('utp-hint').textContent = HINTS_BY_DIRECTION[key];
+  }
+}
+
+initPage();
+
+document.getElementById('anketa-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target;
+  const btn = document.getElementById('anketa-submit');
+
+  const getRadio = (n) => [...form.querySelectorAll(`input[name="${n}"]`)].find(r => r.checked)?.value || '';
+  const getVal = (n) => (form.querySelector(`[name="${n}"]`)?.value || '').trim();
+
+  // Validation — at least socials + services required
+  if (!getVal('socials') && !getVal('services') && !getVal('colors') && !getRadio('style')) {
+    alert('Пожалуйста, заполните хотя бы несколько полей анкеты перед отправкой.');
+    return;
+  }
+  if (!getVal('services')) {
+    alert('Пожалуйста, укажите ваши услуги и цены — это обязательное поле.');
+    form.querySelector('[name="services"]').focus();
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Отправляем...';
+
+  const answers = [
+    { question: 'Instagram / TikTok / Telegram', answer: getVal('socials') },
+    { question: 'Стиль приложения', answer: getRadio('style') },
+    { question: 'Цвета', answer: getVal('colors') },
+    { question: 'Вдохновение / ссылки', answer: getVal('refs') },
+    { question: 'Услуги и цены', answer: getVal('services') },
+    { question: 'Фишка / УТП', answer: getVal('utp') },
+    { question: 'Фото', answer: getRadio('photos') },
+    { question: 'Адрес / выезд', answer: getVal('address') },
+    { question: 'График работы', answer: getVal('schedule') },
+    { question: 'Способ записи', answer: getRadio('booking') },
+    { question: 'Пожелания', answer: getVal('wishes') },
+  ].filter(a => a.answer);
+
+  try {
+    const res = await fetch('/api/anketa', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name || slug, direction, answers })
+    });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('anketa-form-wrap').style.display = 'none';
+      document.getElementById('anketa-success').style.display = 'block';
+    } else {
+      btn.disabled = false;
+      btn.textContent = 'Отправить анкету →';
+      alert('Ошибка. Попробуйте ещё раз.');
+    }
+  } catch {
+    btn.disabled = false;
+    btn.textContent = 'Отправить анкету →';
+    alert('Ошибка соединения. Попробуйте ещё раз.');
+  }
+});
+</script>
+</body>
+</html>

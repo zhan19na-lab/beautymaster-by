@@ -40,6 +40,42 @@ export default async function handler(req, res) {
     });
     const data = await tgRes.json();
     if (!data.ok) return res.status(500).json({ error: 'Telegram error', details: data });
+
+    // Save booking to master's blob data
+    const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
+    if (blobToken && masterUsername) {
+      const slug = masterUsername.replace('@','').toLowerCase();
+      try {
+        const masterRes = await fetch(`https://blob.vercel-storage.com/masters/${slug}.json`, {
+          headers: { Authorization: `Bearer ${blobToken}` }
+        });
+        if (masterRes.ok) {
+          const master = await masterRes.json();
+          const bookings = master.bookings || [];
+          bookings.push({
+            type: type || 'booking',
+            name: name || '—',
+            phone: phone || '—',
+            service: service || '—',
+            date: date || '—',
+            time: time || '—',
+            createdAt: new Date().toISOString()
+          });
+          master.bookings = bookings;
+          await fetch(`https://blob.vercel-storage.com/masters/${slug}.json`, {
+            method: 'PUT',
+            headers: {
+              Authorization: `Bearer ${blobToken}`,
+              'content-type': 'application/json',
+              'x-vercel-blob-add-random-suffix': '0',
+              'x-vercel-blob-access': 'private'
+            },
+            body: JSON.stringify(master)
+          });
+        }
+      } catch { /* non-critical */ }
+    }
+
     return res.status(200).json({ success: true });
   } catch {
     return res.status(500).json({ error: 'Network error' });
