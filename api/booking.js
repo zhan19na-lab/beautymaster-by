@@ -95,7 +95,7 @@ export default async function handler(req, res) {
           });
           const stale = existingBlobs.slice(2);
           if (stale.length) {
-            fetch('https://blob.vercel-storage.com/delete', {
+            await fetch('https://blob.vercel-storage.com/delete', {
               method: 'POST',
               headers: { Authorization: `Bearer ${blobToken}`, 'content-type': 'application/json' },
               body: JSON.stringify({ urls: stale.map(b => b.url) })
