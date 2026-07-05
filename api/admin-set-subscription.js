@@ -43,7 +43,8 @@ export default async function handler(req, res) {
       headers: {
         Authorization: `Bearer ${blobToken}`,
         'content-type': 'application/json',
-        'x-vercel-blob-add-random-suffix': '0',
+        'x-add-random-suffix': '0',
+        'x-allow-overwrite': '1',
         'x-vercel-blob-access': 'private'
       },
       body: JSON.stringify(master)
