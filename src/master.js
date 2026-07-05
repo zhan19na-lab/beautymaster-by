@@ -372,7 +372,8 @@ function initBookingForm() {
       service: window.__bookingService || '—',
       date: window.__bookingDate || '—',
       time: window.__bookingTime || '—',
-      masterUsername: masterData?.tgUsername
+      masterUsername: masterData?.tgUsername,
+      masterSlug: getSlug()
     });
 
     if (!ok) {
@@ -435,7 +436,7 @@ function initContactModal() {
     const btn = e.target.querySelector('.cform-submit');
     const originalText = btn.textContent;
     btn.disabled = true; btn.textContent = 'Отправляем...';
-    const ok = await sendBooking({ type: 'order', name, phone, message, masterUsername: masterData?.tgUsername });
+    const ok = await sendBooking({ type: 'order', name, phone, message, masterUsername: masterData?.tgUsername, masterSlug: getSlug() });
     if (!ok) {
       btn.disabled = false;
       btn.textContent = originalText;
@@ -458,7 +459,7 @@ function initContactModal() {
     const btn = e.target.querySelector('.cform-submit');
     const originalText = btn.textContent;
     btn.disabled = true; btn.textContent = 'Отправляем...';
-    const ok = await sendBooking({ type: 'callback', name, phone, masterUsername: masterData?.tgUsername });
+    const ok = await sendBooking({ type: 'callback', name, phone, masterUsername: masterData?.tgUsername, masterSlug: getSlug() });
     if (!ok) {
       btn.disabled = false;
       btn.textContent = originalText;

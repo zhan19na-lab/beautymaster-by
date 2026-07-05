@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { type, name, phone, service, date, time, message, masterUsername } = req.body || {};
+  const { type, name, phone, service, date, time, message, masterUsername, masterSlug } = req.body || {};
 
   function escapeHtml(v) {
     return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -57,15 +57,29 @@ export default async function handler(req, res) {
 
     // Save booking to master's blob data
     const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
-    if (blobToken && masterUsername) {
-      const slug = masterUsername.replace('@','').toLowerCase();
+    // Prefer the real slug sent by the page; masterUsername (Telegram handle) doesn't
+    // necessarily match the slug, which is derived from the master's name at registration.
+    const slug = masterSlug || masterUsername?.replace('@', '').toLowerCase();
+    if (blobToken && slug) {
       try {
         const listRes = await fetch(`https://blob.vercel-storage.com/?prefix=masters/${slug}/&limit=100`, {
           headers: { Authorization: `Bearer ${blobToken}` }
         });
         const list = await listRes.json();
         const existingBlobs = (list.blobs || []).sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
-        const masterBlob = existingBlobs[0];
+        let masterBlob = existingBlobs[0];
+        let legacyBlob = null;
+
+        // Fall back to the old flat masters/{slug}.json layout for masters created before this scheme existed
+        if (!masterBlob) {
+          const legacyRes = await fetch(`https://blob.vercel-storage.com/?prefix=masters/${slug}.json&limit=1`, {
+            headers: { Authorization: `Bearer ${blobToken}` }
+          });
+          const legacyList = await legacyRes.json().catch(() => ({}));
+          legacyBlob = legacyList.blobs?.[0];
+          masterBlob = legacyBlob;
+        }
+
         if (masterBlob) {
           const masterRes = await fetch(masterBlob.downloadUrl || masterBlob.url, {
             headers: { Authorization: `Bearer ${blobToken}` }
@@ -93,7 +107,7 @@ export default async function handler(req, res) {
             },
             body: JSON.stringify(master)
           });
-          const stale = existingBlobs.slice(2);
+          const stale = existingBlobs.slice(2).concat(legacyBlob ? [legacyBlob] : []);
           if (stale.length) {
             await fetch('https://blob.vercel-storage.com/delete', {
               method: 'POST',
