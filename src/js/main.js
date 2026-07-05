@@ -164,8 +164,9 @@ function isValidContact(val) {
 }
 
 function isValidPhone(val) {
+  if (!/^\+[\d\s\-()]+$/.test(val)) return false;
   const digitsOnly = val.replace(/\D/g, '');
-  return val.startsWith('+') && digitsOnly.length >= 11 && digitsOnly.length <= 12;
+  return digitsOnly.length >= 11 && digitsOnly.length <= 12;
 }
 
 function isValidTg(val) {

@@ -640,6 +640,7 @@ img { max-width: 100%; display: block; }
   transform: translateX(-50%) translateY(0);
 }
 .toast.toast--success { border-color: rgba(76,175,80,0.4); color: #81C784; }
+.toast.toast--error { border-color: rgba(231,76,60,0.4); color: #e74c3c; }
 
 /* ── Responsive ──────────────────────────────────────────── */
 @media (max-width: 1024px) {

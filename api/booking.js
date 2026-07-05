@@ -8,6 +8,20 @@ export default async function handler(req, res) {
 
   const { type, name, phone, service, date, time, message, masterUsername } = req.body || {};
 
+  function escapeHtml(v) {
+    return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  function isValidPhone(v) {
+    if (typeof v !== 'string' || !/^\+[\d\s\-()]+$/.test(v)) return false;
+    const digits = v.replace(/\D/g, '');
+    return digits.length >= 11 && digits.length <= 12;
+  }
+
+  if (phone !== undefined && phone !== null && phone !== '' && !isValidPhone(phone)) {
+    return res.status(400).json({ error: 'Invalid phone format' });
+  }
+
   const token       = process.env.TELEGRAM_BOT_TOKEN;
   const adminChatId = process.env.TELEGRAM_CHAT_ID;
 
@@ -25,11 +39,11 @@ export default async function handler(req, res) {
 
   let text = '';
   if (type === 'callback') {
-    text = `📞 <b>Заказать звонок!</b>\n\n👤 <b>Имя:</b> ${name||'—'}\n📱 <b>Телефон:</b> ${phone||'—'}`;
+    text = `📞 <b>Заказать звонок!</b>\n\n👤 <b>Имя:</b> ${escapeHtml(name)||'—'}\n📱 <b>Телефон:</b> ${escapeHtml(phone)||'—'}`;
   } else if (type === 'booking') {
-    text = `📅 <b>Новая запись!</b>\n\n👤 <b>Клиент:</b> ${name||'—'}\n📱 <b>Телефон:</b> ${phone||'—'}\n💅 <b>Услуга:</b> ${service||'—'}\n📆 <b>Дата:</b> ${date||'—'}\n🕐 <b>Время:</b> ${time||'—'}`;
+    text = `📅 <b>Новая запись!</b>\n\n👤 <b>Клиент:</b> ${escapeHtml(name)||'—'}\n📱 <b>Телефон:</b> ${escapeHtml(phone)||'—'}\n💅 <b>Услуга:</b> ${escapeHtml(service)||'—'}\n📆 <b>Дата:</b> ${escapeHtml(date)||'—'}\n🕐 <b>Время:</b> ${escapeHtml(time)||'—'}`;
   } else {
-    text = `✉️ <b>Новое сообщение!</b>\n\n👤 <b>Имя:</b> ${name||'—'}\n📱 <b>Телефон:</b> ${phone||'—'}\n💬 <b>Сообщение:</b> ${message||'—'}`;
+    text = `✉️ <b>Новое сообщение!</b>\n\n👤 <b>Имя:</b> ${escapeHtml(name)||'—'}\n📱 <b>Телефон:</b> ${escapeHtml(phone)||'—'}\n💬 <b>Сообщение:</b> ${escapeHtml(message)||'—'}`;
   }
 
   try {

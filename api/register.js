@@ -114,8 +114,11 @@ export default async function handler(req, res) {
   const adminId = process.env.TELEGRAM_CHAT_ID;
   const blobToken = process.env.BLOB_READ_WRITE_TOKEN;
 
+  if (!blobToken) return res.status(500).json({ error: 'Storage not configured' });
+
   // Create master page in Blob storage
-  if (blobToken) {
+  let saved = false;
+  {
     const masterData = {
       slug, name: nameFixed, specialty: direction, phone: contact, editToken,
       tgUsername: tgUsername?.replace('@','') || '',
@@ -135,7 +138,7 @@ export default async function handler(req, res) {
       createdAt: new Date().toISOString()
     };
 
-    await fetch(`https://blob.vercel-storage.com/masters/${slug}.json`, {
+    const putRes = await fetch(`https://blob.vercel-storage.com/masters/${slug}.json`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${blobToken}`,
@@ -144,8 +147,11 @@ export default async function handler(req, res) {
         'x-vercel-blob-access': 'private'
       },
       body: JSON.stringify(masterData)
-    }).catch(() => {});
+    }).catch(() => null);
+    saved = !!putRes?.ok;
   }
+
+  if (!saved) return res.status(500).json({ error: 'Failed to save master page' });
 
   // Notify admin
   if (token && adminId) {
@@ -174,7 +180,7 @@ export default async function handler(req, res) {
     if (masterChatId) {
       const replyText = isVip
         ? `🌸 <b>${nameFixed}, ваша заявка принята!</b>\n\n<i>Спасибо за доверие — для меня это очень важно.</i>\n\n<i>Я лично свяжусь с вами в ближайшее время, и мы в тёплой беседе обсудим каждую деталь.</i>\n\n<i>Ваше приложение будет создано</i> <b>под ключ</b> <i>— красиво, профессионально и именно так, как вы мечтаете.</i>\n\n<i>До скорой встречи!</i> 🤍\n\n🌸 <b>Давайте создадим что-то по-настоящему ваше!</b>\n<i>Заполните короткую анкету — это займёт 3 минуты и поможет мне подготовиться:</i>\n\nhttps://beautymaster-by.vercel.app/anketa?slug=${slug}`
-        : `✅ <b>Заявка получена, ${nameFixed}!</b>\n\n🎉 Ваша страница уже готова — настройте её прямо сейчас.\n\n🔗 <b>Ваша личная ссылка для редактирования:</b>\n${editUrl}\n\n⚠️ Эту ссылку никому не передавайте — по ней можно изменять ваш профиль.\n\n👁 <b>Публичная ссылка для клиентов:</b>\n${pageUrl}\n\nПоделитесь публичной ссылкой в Instagram, TikTok и WhatsApp — клиенты смогут записаться онлайн.`;
+        : `✅ <b>Заявка получена, ${nameFixed}!</b>\n\n🎉 Ваша страница уже готова — настройте её прямо сейчас.\n\n🔗 <b>Ваша личная ссылка для редактирования:</b>\n${editUrl}\n\n⚠️ Эту ссылку никому не передавайте — по ней можно изменять ваш профиль.\n\n👁 <b>Публичная ссылка для клиентов:</b>\n${pageUrl}\n\nПоделитесь публичной ссылкой в Instagram и TikTok — клиенты смогут записаться онлайн.`;
       await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

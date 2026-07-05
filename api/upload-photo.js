@@ -29,15 +29,24 @@ export default async function handler(req, res) {
   if (masterData.editToken !== token) return res.status(403).json({ error: 'Forbidden' });
 
   // Read raw body as buffer
+  const MAX_SIZE = photoType === 'avatar' ? 5 * 1024 * 1024 : 10 * 1024 * 1024;
   const chunks = [];
-  for await (const chunk of req) chunks.push(chunk);
+  let total = 0;
+  for await (const chunk of req) {
+    total += chunk.length;
+    if (total > MAX_SIZE) return res.status(413).json({ error: `File too large (max ${Math.round(MAX_SIZE / 1024 / 1024)} MB)` });
+    chunks.push(chunk);
+  }
   const buffer = Buffer.concat(chunks);
+  if (!buffer.length) return res.status(400).json({ error: 'Empty file' });
 
-  // Detect content type from first bytes
-  let ext = 'jpg';
-  if (buffer[0] === 0x89 && buffer[1] === 0x50) ext = 'png';
+  // Detect content type from first bytes — reject anything that isn't a recognized image
+  let ext = null;
+  if (buffer[0] === 0xFF && buffer[1] === 0xD8) ext = 'jpg';
+  else if (buffer[0] === 0x89 && buffer[1] === 0x50) ext = 'png';
   else if (buffer[0] === 0x47 && buffer[1] === 0x49) ext = 'gif';
   else if (buffer[0] === 0x52 && buffer[1] === 0x49) ext = 'webp';
+  if (!ext) return res.status(400).json({ error: 'Unsupported file type — only JPG, PNG, GIF, WEBP are allowed' });
   const contentType = ext === 'png' ? 'image/png' : ext === 'gif' ? 'image/gif' : ext === 'webp' ? 'image/webp' : 'image/jpeg';
 
   // Upload photo to Blob
@@ -66,7 +75,7 @@ export default async function handler(req, res) {
 
   // Update master profile
   if (photoType === 'avatar') {
-    masterData.avatarUrl = photoUrl;
+    masterData.photo = photoUrl;
   } else {
     if (!masterData.photos) masterData.photos = [];
     masterData.photos.push(photoUrl);

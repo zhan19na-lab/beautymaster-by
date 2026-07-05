@@ -43,6 +43,9 @@ async function checkOwner() {
   }
 
   async function uploadPhoto(file, photoType) {
+    const maxMb = photoType === 'avatar' ? 5 : 10;
+    if (!file.type.startsWith('image/')) { showUploadToast('Можно загружать только изображения', false); return; }
+    if (file.size > maxMb * 1024 * 1024) { showUploadToast(`Файл слишком большой (максимум ${maxMb} МБ)`, false); return; }
     const toastMsg = photoType === 'avatar' ? 'Загружаем аватарку...' : 'Загружаем фото...';
     showUploadToast(toastMsg);
     try {
@@ -187,9 +190,13 @@ async function checkOwner() {
       el.replaceWith(inp);
       inp.focus(); inp.select();
       const save = () => {
-        el.textContent = inp.value.trim() || original;
+        const entered = inp.value.trim() || original;
+        const invalid = !/\d/.test(entered);
+        const val = invalid ? original : entered;
+        el.textContent = val;
         inp.replaceWith(el);
-        showEditToast();
+        if (invalid) showEditToast('Цена должна содержать хотя бы одну цифру', false);
+        else showEditToast();
       };
       inp.addEventListener('blur', save);
       inp.addEventListener('keydown', e => { if (e.key === 'Enter') inp.blur(); if (e.key === 'Escape') inp.replaceWith(el); });
@@ -214,10 +221,10 @@ async function checkOwner() {
     });
   });
 
-  function showEditToast() {
+  function showEditToast(msg = '✓ Изменение сохранено', ok = true) {
     const t = document.createElement('div');
-    t.textContent = '✓ Изменение сохранено';
-    t.style.cssText = `position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#141414;border:1px solid var(--gold-border);color:#81C784;font-size:0.82rem;padding:10px 24px;z-index:999;animation:fadeIn 0.3s;`;
+    t.textContent = msg;
+    t.style.cssText = `position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#141414;border:1px solid ${ok ? 'var(--gold-border)' : '#c0392b'};color:${ok ? '#81C784' : '#e74c3c'};font-size:0.82rem;padding:10px 24px;z-index:999;animation:fadeIn 0.3s;`;
     document.body.appendChild(t);
     setTimeout(() => t.remove(), 2200);
   }
@@ -382,8 +389,9 @@ function showBookingError(id, msg) {
 }
 
 function isValidPhone(val) {
+  if (!/^\+[\d\s\-()]+$/.test(val)) return false;
   const digits = val.replace(/\D/g, '');
-  return val.startsWith('+') && digits.length >= 11 && digits.length <= 12;
+  return digits.length >= 11 && digits.length <= 12;
 }
 
 /* ── Multi-step booking ────────────────────────────────────── */
@@ -472,6 +480,21 @@ function shakeStep(step) {
   el.style.animation = 'shake 0.4s ease';
 }
 
+/* ── Shared booking submit helper ─── */
+async function sendBooking(payload) {
+  try {
+    const res = await fetch('/api/booking', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json().catch(() => ({}));
+    return res.ok && !!data.success;
+  } catch {
+    return false;
+  }
+}
+
 /* ── Booking form submit ───────────────────────────────────── */
 const bookingForm = document.getElementById('booking-form');
 const bookingSuccess = document.getElementById('booking-success');
@@ -496,21 +519,25 @@ bookingForm?.addEventListener('submit', async (e) => {
   if (!valid) return;
 
   const btn = bookingForm.querySelector('.btn-submit');
+  const originalText = btn.textContent;
   btn.disabled = true;
   btn.textContent = 'Отправляем...';
 
-  await fetch('/api/booking', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      type: 'booking',
-      name,
-      phone,
-      service: window.__bookingService || '—',
-      date: window.__bookingDate || '—',
-      time: window.__bookingTime || '—'
-    })
-  }).catch(() => {});
+  const ok = await sendBooking({
+    type: 'booking',
+    name,
+    phone,
+    service: window.__bookingService || '—',
+    date: window.__bookingDate || '—',
+    time: window.__bookingTime || '—'
+  });
+
+  if (!ok) {
+    btn.disabled = false;
+    btn.textContent = originalText;
+    showBookingError('b-phone', 'Не удалось отправить заявку. Проверьте связь и попробуйте ещё раз.');
+    return;
+  }
 
   document.querySelector('.booking-wrap').innerHTML = '';
   bookingSuccess.style.display = 'flex';
@@ -607,13 +634,16 @@ document.querySelectorAll('.bform-input').forEach(el => {
     if (!message || message.length < 3) { showCFormError('co-message', 'Опишите что вы хотите'); valid = false; }
     if (!valid) return;
     const btn = e.target.querySelector('.cform-submit');
+    const originalText = btn.textContent;
     btn.disabled = true;
     btn.textContent = 'Отправляем...';
-    await fetch('/api/booking', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'order', name, phone, message })
-    }).catch(() => {});
+    const ok = await sendBooking({ type: 'order', name, phone, message });
+    if (!ok) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      showCFormError('co-message', 'Не удалось отправить. Проверьте связь и попробуйте ещё раз.');
+      return;
+    }
     e.target.style.display = 'none';
     document.getElementById('corder-success').style.display = 'flex';
   });
@@ -629,13 +659,16 @@ document.querySelectorAll('.bform-input').forEach(el => {
     else if (!isValidPhone(phone)) { showCFormError('cc-phone', 'Неверный формат. Пример: +375291234567'); valid = false; }
     if (!valid) return;
     const btn = e.target.querySelector('.cform-submit');
+    const originalText = btn.textContent;
     btn.disabled = true;
     btn.textContent = 'Отправляем...';
-    await fetch('/api/booking', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'callback', name, phone })
-    }).catch(() => {});
+    const ok = await sendBooking({ type: 'callback', name, phone });
+    if (!ok) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      showCFormError('cc-phone', 'Не удалось отправить. Проверьте связь и попробуйте ещё раз.');
+      return;
+    }
     e.target.style.display = 'none';
     document.getElementById('ccallback-success').style.display = 'flex';
   });

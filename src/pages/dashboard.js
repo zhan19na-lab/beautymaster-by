@@ -2,28 +2,101 @@
    BEAUTYMASTER.BY — Dashboard JS
    ============================================================ */
 
-/* ── State ─────────────────────────────────────────────────── */
+const DAY_KEYS   = ['mon','tue','wed','thu','fri','sat','sun'];
+const DAY_LABELS = ['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота','Воскресенье'];
+
+const params = new URLSearchParams(window.location.search);
+const slug   = params.get('slug');
+const token  = params.get('token');
+
+let master = null; // loaded from server, source of truth
+
 const state = {
-  services: [
-    { id: 1, name: 'Маникюр классический',  price: 'от 30 BYN' },
-    { id: 2, name: 'Маникюр аппаратный',    price: 'от 40 BYN' },
-    { id: 3, name: 'Педикюр классический',  price: 'от 45 BYN' },
-    { id: 4, name: 'Покрытие гель-лак',     price: 'от 25 BYN' },
-    { id: 5, name: 'Наращивание ногтей',    price: 'от 80 BYN' },
-    { id: 6, name: 'Снятие покрытия',       price: '10 BYN' },
-    { id: 7, name: 'Дизайн (1 ноготь)',     price: 'от 3 BYN' },
-  ],
-  schedule: [
-    { day: 'Понедельник', enabled: true,  from: '10:00', to: '20:00' },
-    { day: 'Вторник',     enabled: true,  from: '10:00', to: '20:00' },
-    { day: 'Среда',       enabled: true,  from: '10:00', to: '20:00' },
-    { day: 'Четверг',     enabled: true,  from: '10:00', to: '20:00' },
-    { day: 'Пятница',     enabled: true,  from: '10:00', to: '20:00' },
-    { day: 'Суббота',     enabled: true,  from: '10:00', to: '18:00' },
-    { day: 'Воскресенье', enabled: false, from: '10:00', to: '18:00' },
-  ],
-  nextServiceId: 8,
+  services: [],
+  schedule: DAY_KEYS.map((key, i) => ({ key, day: DAY_LABELS[i], enabled: i < 6, from: '10:00', to: '20:00' })),
+  nextServiceId: 1,
 };
+
+function isValidPhone(v) {
+  if (!v) return true; // optional fields
+  if (!/^\+[\d\s\-()]+$/.test(v)) return false;
+  const digits = v.replace(/\D/g, '');
+  return digits.length >= 11 && digits.length <= 12;
+}
+
+/* ── Block access without a valid personal link ─────────────── */
+function showBlockedScreen(message) {
+  document.body.innerHTML = `
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#0a0a0a;">
+      <div style="text-align:center;max-width:420px;">
+        <div style="font-size:2.5rem;margin-bottom:16px;">🔒</div>
+        <h1 style="color:#F5F0E8;font-family:'Cormorant Garant',serif;font-size:1.6rem;margin-bottom:12px;">${message}</h1>
+        <p style="color:#8a7a6a;font-size:0.9rem;line-height:1.6;">
+          Кабинет мастера открывается только по персональной ссылке, которую вы получили в Telegram после регистрации.
+        </p>
+        <a href="../index.html" style="display:inline-block;margin-top:24px;color:#C9A96E;font-size:0.9rem;">← На главную</a>
+      </div>
+    </div>`;
+}
+
+/* ── Load master data from server ────────────────────────────── */
+async function loadMasterData() {
+  const verifyRes = await fetch(`/api/verify-token?slug=${slug}&token=${token}`).then(r => r.json()).catch(() => ({ valid: false }));
+  if (!verifyRes.valid) return null;
+  const res = await fetch(`/api/get-master?slug=${slug}`);
+  if (!res.ok) return null;
+  return res.json();
+}
+
+function scheduleFromMaster(m) {
+  return DAY_KEYS.map((key, i) => {
+    const d = m.schedule?.[key];
+    return { key, day: DAY_LABELS[i], enabled: d?.enabled ?? false, from: d?.from || '10:00', to: d?.to || '20:00' };
+  });
+}
+
+function servicesFromMaster(m) {
+  return (m.services || []).map((s, i) => ({ id: i + 1, name: s.name || '', price: s.price || '', desc: s.desc || '' }));
+}
+
+function populateForm(m) {
+  document.getElementById('sb-avatar').innerHTML = m.photo ? `<img src="${m.photo}" alt="Фото" />` : initials(m.name);
+  document.getElementById('sb-name').textContent = m.name || 'Мастер';
+  document.getElementById('sb-spec').textContent = m.specialty ? `💅 ${m.specialty}` : '';
+
+  const avPreview = document.getElementById('avatar-preview');
+  avPreview.innerHTML = m.photo ? `<img src="${m.photo}" alt="Фото профиля" />` : initials(m.name);
+
+  document.getElementById('p-name').value = m.name || '';
+  if (m.specialty) {
+    const sel = document.getElementById('p-direction');
+    for (const opt of sel.options) if (opt.value === m.specialty) { sel.value = m.specialty; break; }
+  }
+  document.getElementById('p-location').value = m.city || '';
+  document.getElementById('p-phone').value = m.phone || '';
+  document.getElementById('p-instagram').value = m.instagram || '';
+  document.getElementById('p-tiktok').value = m.tiktok || '';
+  document.getElementById('p-bio').value = m.bio || '';
+  document.getElementById('bio-count').textContent = (m.bio || '').length;
+  document.getElementById('p-tagline').value = m.tagline || '';
+
+  document.getElementById('master-link').value = `beautymaster-by.vercel.app/master/${m.slug || slug}`;
+
+  state.services = servicesFromMaster(m);
+  state.nextServiceId = state.services.length + 1;
+  renderServices();
+
+  state.schedule = scheduleFromMaster(m);
+  renderSchedule();
+
+  const grid = document.getElementById('portfolio-grid-editor');
+  grid.innerHTML = '';
+  (m.photos || []).forEach(url => addThumb(url, '', true));
+}
+
+function initials(name) {
+  return (name || '').split(' ').slice(0, 2).map(w => w[0]?.toUpperCase() || '').join('') || '?';
+}
 
 /* ── Sidebar nav ───────────────────────────────────────────── */
 document.querySelectorAll('.snav-item[data-section]').forEach(item => {
@@ -50,11 +123,7 @@ document.querySelectorAll('.snav-item[data-section]').forEach(item => {
 
 /* ── Statistics ────────────────────────────────────────────── */
 async function loadStats() {
-  const params = new URLSearchParams(window.location.search);
-  const token  = params.get('token');
-  const slug   = window.location.pathname.split('/master/')[1]?.split('?')[0];
-  if (!slug || !token) return;
-
+  if (!slug) return;
   try {
     const res  = await fetch(`/api/get-master?slug=${slug}`);
     const data = await res.json();
@@ -99,6 +168,40 @@ mobileBurger?.addEventListener('click', () => {
   document.body.style.overflow = open ? 'hidden' : '';
 });
 
+/* ── Toast ─────────────────────────────────────────────────── */
+let toastTimer;
+function showToast(msg, type = '') {
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+  clearTimeout(toastTimer);
+  toast.textContent = msg;
+  toast.className = 'toast show' + (type ? ` toast--${type}` : '');
+  toastTimer = setTimeout(() => { toast.className = 'toast'; }, 3000);
+}
+
+/* ── Upload a photo to the server ─────────────────────────────── */
+async function uploadPhoto(file, photoType) {
+  const maxMb = photoType === 'avatar' ? 5 : 10;
+  if (!file.type.startsWith('image/')) { showToast('Можно загружать только изображения', 'error'); return null; }
+  if (file.size > maxMb * 1024 * 1024) { showToast(`Файл слишком большой (максимум ${maxMb} МБ)`, 'error'); return null; }
+
+  showToast(photoType === 'avatar' ? 'Загружаем аватарку...' : 'Загружаем фото...');
+  try {
+    const res = await fetch('/api/upload-photo', {
+      method: 'POST',
+      headers: { 'Content-Type': file.type, 'x-slug': slug, 'x-token': token, 'x-photo-type': photoType },
+      body: file
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.error || 'Ошибка загрузки');
+    showToast(photoType === 'avatar' ? '✓ Аватарка обновлена' : '✓ Фото добавлено', 'success');
+    return data.url;
+  } catch (err) {
+    showToast('Ошибка: ' + err.message, 'error');
+    return null;
+  }
+}
+
 /* ── Avatar upload ─────────────────────────────────────────── */
 (function initAvatarUpload() {
   const area    = document.getElementById('avatar-upload-area');
@@ -107,16 +210,16 @@ mobileBurger?.addEventListener('click', () => {
   const sbAv    = document.getElementById('sb-avatar');
 
   area?.addEventListener('click', () => input.click());
-  input?.addEventListener('change', (e) => {
+  input?.addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const src = ev.target.result;
-      preview.innerHTML = `<img src="${src}" alt="Фото профиля" />`;
-      sbAv.innerHTML    = `<img src="${src}" alt="Фото" />`;
-    };
-    reader.readAsDataURL(file);
+    const url = await uploadPhoto(file, 'avatar');
+    if (url) {
+      preview.innerHTML = `<img src="${url}" alt="Фото профиля" />`;
+      sbAv.innerHTML    = `<img src="${url}" alt="Фото" />`;
+      if (master) master.photo = url;
+    }
+    input.value = '';
   });
 })();
 
@@ -133,7 +236,7 @@ mobileBurger?.addEventListener('click', () => {
   update();
 })();
 
-/* ── AI Bio helper ─────────────────────────────────────────── */
+/* ── AI Bio helper (demo only — not a real generator) ────────── */
 (function initAI() {
   const aiBtn      = document.getElementById('ai-bio-btn');
   const aiPanel    = document.getElementById('ai-panel');
@@ -150,7 +253,6 @@ mobileBurger?.addEventListener('click', () => {
     aiPanel.style.display = open ? 'block' : 'none';
   });
 
-  // Demo AI responses (in real app — calls Gemini API)
   const demoResponses = [
     'Более 5 лет я превращаю обычный маникюр в маленький шедевр. Каждая клиентка для меня — это отдельный проект, и я подхожу к нему с полной отдачей. Работаю только с проверенными премиальными материалами — потому что вы заслуживаете лучшего. Ко мне приходят один раз, а возвращаются снова и снова.',
     'Мои ногти — это не просто покрытие, это акцент вашего образа. За 5 лет практики я поняла: клиентки хотят не просто сделать ногти, они хотят уйти с хорошим настроением и уверенностью в себе. Именно это я и дарю каждой. Записывайтесь — и убедитесь сами.',
@@ -159,7 +261,6 @@ mobileBurger?.addEventListener('click', () => {
   let responseIndex = 0;
 
   generateBtn?.addEventListener('click', () => {
-    const prompt = promptField.value.trim();
     generateBtn.disabled = true;
     generateBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg> Генерирую...';
 
@@ -192,7 +293,7 @@ function renderServices() {
   const editor = document.getElementById('services-editor');
   if (!editor) return;
   editor.innerHTML = '';
-  state.services.forEach((svc, idx) => {
+  state.services.forEach((svc) => {
     const row = document.createElement('div');
     row.className = 'service-edit-row';
     row.dataset.id = svc.id;
@@ -218,14 +319,12 @@ function renderServices() {
 }
 
 document.getElementById('add-service-btn')?.addEventListener('click', () => {
-  state.services.push({ id: state.nextServiceId++, name: '', price: '' });
+  state.services.push({ id: state.nextServiceId++, name: '', price: '', desc: '' });
   renderServices();
   const rows = document.querySelectorAll('.service-edit-row');
   const last = rows[rows.length - 1];
   last?.querySelector('.service-edit-name')?.focus();
 });
-
-renderServices();
 
 /* ── Schedule Editor ───────────────────────────────────────── */
 function renderSchedule() {
@@ -249,13 +348,11 @@ function renderSchedule() {
       <div></div>
     `;
 
-    // Toggle checkbox
     row.querySelector('.day-check')?.addEventListener('click', () => {
       state.schedule[idx].enabled = !state.schedule[idx].enabled;
       renderSchedule();
     });
 
-    // Time inputs
     row.querySelectorAll('.day-time-input').forEach(input => {
       input.addEventListener('change', (e) => {
         state.schedule[idx][e.target.dataset.field] = e.target.value;
@@ -267,8 +364,6 @@ function renderSchedule() {
   });
 }
 
-renderSchedule();
-
 /* ── Portfolio upload ──────────────────────────────────────── */
 (function initPortfolio() {
   const uploadArea = document.getElementById('portfolio-upload-area');
@@ -277,7 +372,6 @@ renderSchedule();
 
   uploadArea?.addEventListener('click', () => input.click());
 
-  // Drag & drop
   uploadArea?.addEventListener('dragover', (e) => {
     e.preventDefault();
     uploadArea.classList.add('drag-over');
@@ -291,39 +385,101 @@ renderSchedule();
 
   input?.addEventListener('change', (e) => handleFiles(Array.from(e.target.files)));
 
-  function handleFiles(files) {
-    files.filter(f => f.type.startsWith('image/')).forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (ev) => addThumb(ev.target.result, file.name.replace(/\.[^.]+$/, ''));
-      reader.readAsDataURL(file);
-    });
+  async function handleFiles(files) {
+    if ((grid.children.length + files.length) > 20) {
+      showToast('Максимум 20 фото в портфолио', 'error');
+    }
+    for (const file of files.filter(f => f.type.startsWith('image/'))) {
+      const url = await uploadPhoto(file, 'portfolio');
+      if (url) {
+        if (master) { master.photos = master.photos || []; master.photos.push(url); }
+        addThumb(url, '');
+      }
+    }
   }
-
-  function addThumb(src, caption = '') {
-    const thumb = document.createElement('div');
-    thumb.className = 'portfolio-thumb';
-    thumb.innerHTML = `
-      <img src="${src}" alt="${caption}" />
-      <div class="thumb-overlay">
-        <button class="thumb-edit-btn" title="Подпись">✎</button>
-        <button class="thumb-delete-btn" title="Удалить">✕</button>
-      </div>
-      <div class="thumb-caption-wrap">
-        <input type="text" class="thumb-caption" placeholder="Подпись (необязательно)" value="${caption}" />
-      </div>
-    `;
-    thumb.querySelector('.thumb-delete-btn').addEventListener('click', () => thumb.remove());
-    grid?.appendChild(thumb);
-  }
-
-  // Existing delete buttons
-  grid?.querySelectorAll('.thumb-delete-btn').forEach(btn => {
-    btn.addEventListener('click', () => btn.closest('.portfolio-thumb').remove());
-  });
 })();
 
-/* ── Save buttons ──────────────────────────────────────────── */
-window.saveSection = function(section) {
+function addThumb(src, caption = '') {
+  const grid = document.getElementById('portfolio-grid-editor');
+  const thumb = document.createElement('div');
+  thumb.className = 'portfolio-thumb';
+  thumb.innerHTML = `
+    <img src="${src}" alt="${caption}" />
+    <div class="thumb-overlay">
+      <button class="thumb-edit-btn" title="Подпись">✎</button>
+      <button class="thumb-delete-btn" title="Удалить">✕</button>
+    </div>
+    <div class="thumb-caption-wrap">
+      <input type="text" class="thumb-caption" placeholder="Подпись (необязательно)" value="${caption}" />
+    </div>
+  `;
+  thumb.querySelector('.thumb-delete-btn').addEventListener('click', () => {
+    if (master?.photos) master.photos = master.photos.filter(u => u !== src);
+    thumb.remove();
+  });
+  grid?.appendChild(thumb);
+}
+
+/* ── Save to server ────────────────────────────────────────── */
+async function persist(partial) {
+  if (!slug || !token) { showToast('Нет доступа к сохранению', 'error'); return false; }
+  try {
+    const res = await fetch('/api/save-master', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...partial, slug, token })
+    });
+    const data = await res.json();
+    if (!res.ok || !data.success) throw new Error(data.error || 'Ошибка сохранения');
+    return true;
+  } catch (err) {
+    showToast('Ошибка: ' + err.message, 'error');
+    return false;
+  }
+}
+
+window.saveSection = async function(section) {
+  if (section === 'profile') {
+    const name  = document.getElementById('p-name')?.value.trim();
+    const phone = document.getElementById('p-phone')?.value.trim();
+    if (!name || name.length < 2) { showToast('Введите имя мастера', 'error'); return; }
+    if (phone && !isValidPhone(phone)) { showToast('Неверный формат телефона. Пример: +375291234567', 'error'); return; }
+
+    const dir = document.getElementById('p-direction')?.value;
+    const ok = await persist({
+      name,
+      specialty: dir,
+      city: document.getElementById('p-location')?.value.trim(),
+      phone,
+      instagram: document.getElementById('p-instagram')?.value.trim(),
+      tiktok: document.getElementById('p-tiktok')?.value.trim(),
+      bio: document.getElementById('p-bio')?.value.trim(),
+      tagline: document.getElementById('p-tagline')?.value.trim(),
+    });
+    if (!ok) return;
+
+    document.getElementById('sb-name').textContent = name;
+    document.getElementById('sb-spec').textContent = dir ? `💅 ${dir}` : '';
+    if (master) Object.assign(master, { name, specialty: dir });
+
+  } else if (section === 'services') {
+    for (const s of state.services) {
+      if (!s.name.trim()) { showToast('У каждой услуги должно быть название', 'error'); return; }
+      if (!/\d/.test(s.price)) { showToast(`Цена услуги «${s.name}» должна содержать хотя бы одну цифру`, 'error'); return; }
+    }
+    const ok = await persist({ services: state.services.map(s => ({ name: s.name.trim(), price: s.price.trim(), desc: s.desc || '' })) });
+    if (!ok) return;
+
+  } else if (section === 'schedule') {
+    const schedule = {};
+    state.schedule.forEach(d => { schedule[d.key] = { enabled: d.enabled, from: d.from, to: d.to }; });
+    const ok = await persist({ schedule });
+    if (!ok) return;
+
+  } else if (section === 'portfolio') {
+    // Photos are already uploaded and saved individually as they're added; nothing extra to persist.
+  }
+
   const labels = {
     profile:   '✓ Профиль сохранён',
     services:  '✓ Услуги сохранены',
@@ -331,29 +487,12 @@ window.saveSection = function(section) {
     portfolio: '✓ Портфолио сохранено',
   };
   showToast(labels[section] || '✓ Сохранено', 'success');
-
-  // Update sidebar name/spec from profile inputs
-  if (section === 'profile') {
-    const name = document.getElementById('p-name')?.value;
-    const dir  = document.getElementById('p-direction')?.value;
-    if (name) document.getElementById('sb-name').textContent = name;
-    if (dir)  document.getElementById('sb-spec').textContent = dir;
-    // Initials
-    if (name) {
-      const parts = name.trim().split(' ');
-      const initials = parts.length >= 2
-        ? parts[0][0] + parts[1][0]
-        : parts[0].slice(0, 2);
-      const av = document.getElementById('avatar-preview');
-      if (av && !av.querySelector('img')) av.textContent = initials.toUpperCase();
-      const sbAv = document.getElementById('sb-avatar');
-      if (sbAv && !sbAv.querySelector('img')) sbAv.textContent = initials.toUpperCase();
-    }
-  }
 };
 
-document.getElementById('save-all-btn')?.addEventListener('click', () => {
-  showToast('✓ Все изменения сохранены', 'success');
+document.getElementById('save-all-btn')?.addEventListener('click', async () => {
+  await window.saveSection('profile');
+  await window.saveSection('services');
+  await window.saveSection('schedule');
 });
 
 /* ── Link copy ─────────────────────────────────────────────── */
@@ -368,13 +507,17 @@ document.getElementById('link-copy-btn')?.addEventListener('click', function() {
   }, 2000);
 });
 
-/* ── Toast ─────────────────────────────────────────────────── */
-let toastTimer;
-function showToast(msg, type = '') {
-  const toast = document.getElementById('toast');
-  if (!toast) return;
-  clearTimeout(toastTimer);
-  toast.textContent = msg;
-  toast.className = 'toast show' + (type ? ` toast--${type}` : '');
-  toastTimer = setTimeout(() => { toast.className = 'toast'; }, 3000);
-}
+/* ── Init ──────────────────────────────────────────────────── */
+(async function init() {
+  if (!slug || !token) {
+    showBlockedScreen('Личная ссылка не найдена');
+    return;
+  }
+  const data = await loadMasterData();
+  if (!data) {
+    showBlockedScreen('Не удалось открыть кабинет');
+    return;
+  }
+  master = data;
+  populateForm(master);
+})();

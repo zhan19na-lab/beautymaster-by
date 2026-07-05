@@ -45,6 +45,11 @@ function renderPage(d) {
   document.getElementById('master-spec').textContent = `💅 ${d.specialty || 'Мастер красоты'}`;
   document.getElementById('master-city').textContent = `${d.city || 'Беларусь'} · Принимаю на дому`;
   document.getElementById('master-bio').textContent = d.bio || '';
+  const taglineEl = document.getElementById('master-tagline');
+  if (taglineEl) {
+    if (d.tagline) { taglineEl.textContent = `«${d.tagline}»`; taglineEl.style.display = 'block'; }
+    else { taglineEl.style.display = 'none'; }
+  }
   document.getElementById('booking-title').textContent = 'Онлайн-запись к мастеру';
   document.getElementById('footer-copy').textContent = `© 2025 ${d.name} · Все права защищены`;
 
@@ -264,10 +269,26 @@ function renderTimeSlots(date) {
   });
 }
 
+/* ── Shared booking submit helper ─── */
+async function sendBooking(payload) {
+  try {
+    const res = await fetch('/api/booking', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json().catch(() => ({}));
+    return res.ok && !!data.success;
+  } catch {
+    return false;
+  }
+}
+
 /* ── Booking form ─── */
 function isValidPhone(v) {
+  if (!/^\+[\d\s\-()]+$/.test(v)) return false;
   const digits = v.replace(/\D/g, '');
-  return v.startsWith('+') && digits.length >= 11 && digits.length <= 12;
+  return digits.length >= 11 && digits.length <= 12;
 }
 
 function showErr(id, msg) {
@@ -342,20 +363,24 @@ function initBookingForm() {
     if (!valid) return;
 
     const btn = form.querySelector('.btn-submit');
+    const originalText = btn.textContent;
     btn.disabled = true;
     btn.textContent = 'Отправляем...';
 
-    await fetch('/api/booking', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        type: 'booking', name, phone,
-        service: window.__bookingService || '—',
-        date: window.__bookingDate || '—',
-        time: window.__bookingTime || '—',
-        masterUsername: masterData?.tgUsername
-      })
-    }).catch(() => {});
+    const ok = await sendBooking({
+      type: 'booking', name, phone,
+      service: window.__bookingService || '—',
+      date: window.__bookingDate || '—',
+      time: window.__bookingTime || '—',
+      masterUsername: masterData?.tgUsername
+    });
+
+    if (!ok) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      showErr('b-phone', 'Не удалось отправить заявку. Проверьте связь и попробуйте ещё раз.');
+      return;
+    }
 
     document.querySelector('.booking-wrap').innerHTML = '';
     succ.style.display = 'flex';
@@ -408,8 +433,15 @@ function initContactModal() {
     if (!message || message.length < 3) { showCErr('co-message', 'Опишите что вы хотите'); valid = false; }
     if (!valid) return;
     const btn = e.target.querySelector('.cform-submit');
+    const originalText = btn.textContent;
     btn.disabled = true; btn.textContent = 'Отправляем...';
-    await fetch('/api/booking', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'order', name, phone, message, masterUsername: masterData?.tgUsername }) }).catch(() => {});
+    const ok = await sendBooking({ type: 'order', name, phone, message, masterUsername: masterData?.tgUsername });
+    if (!ok) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      showCErr('co-message', 'Не удалось отправить. Проверьте связь и попробуйте ещё раз.');
+      return;
+    }
     e.target.style.display = 'none';
     document.getElementById('corder-success').style.display = 'flex';
   });
@@ -424,8 +456,15 @@ function initContactModal() {
     else if (!isValidPhone(phone)) { showCErr('cc-phone', 'Неверный формат. Пример: +375291234567'); valid = false; }
     if (!valid) return;
     const btn = e.target.querySelector('.cform-submit');
+    const originalText = btn.textContent;
     btn.disabled = true; btn.textContent = 'Отправляем...';
-    await fetch('/api/booking', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ type: 'callback', name, phone, masterUsername: masterData?.tgUsername }) }).catch(() => {});
+    const ok = await sendBooking({ type: 'callback', name, phone, masterUsername: masterData?.tgUsername });
+    if (!ok) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      showCErr('cc-phone', 'Не удалось отправить. Проверьте связь и попробуйте ещё раз.');
+      return;
+    }
     e.target.style.display = 'none';
     document.getElementById('ccallback-success').style.display = 'flex';
   });
@@ -488,7 +527,7 @@ async function initOwnerMode() {
   // Public link panel — always visible while editing
   const publicUrl = `https://beautymaster-by.vercel.app/master/${slug}`;
   const linkBar = document.createElement('div');
-  linkBar.style.cssText = `position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid rgba(201,169,110,0.25);padding:10px 16px;display:flex;align-items:center;gap:10px;z-index:9000;`;
+  linkBar.style.cssText = `position:fixed;bottom:0;left:0;right:0;background:#111;border-top:1px solid rgba(201,169,110,0.25);padding:10px 16px calc(10px + env(safe-area-inset-bottom)) 16px;display:flex;align-items:center;gap:10px;z-index:9000;`;
   linkBar.innerHTML = `
     <span style="color:#6A6A6A;font-size:0.75rem;white-space:nowrap;">👁 Ссылка для клиентов:</span>
     <span id="owner-pub-url" style="color:#C9A96E;font-size:0.78rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${publicUrl}</span>
@@ -531,7 +570,7 @@ async function initOwnerMode() {
           </div>
           <div style="display:flex;gap:14px;align-items:flex-start;">
             <div style="min-width:32px;height:32px;border-radius:50%;background:rgba(201,169,110,0.15);border:1px solid rgba(201,169,110,0.3);display:flex;align-items:center;justify-content:center;color:#C9A96E;font-size:0.85rem;font-weight:600;">4</div>
-            <div><p style="color:#F5F0E8;font-size:0.9rem;margin-bottom:2px;"><strong>Ссылка для клиентов</strong></p><p style="color:#E8D5B0;font-size:0.82rem;font-style:italic;">Публичная ссылка из Telegram — делитесь ею в Instagram, TikTok, WhatsApp</p></div>
+            <div><p style="color:#F5F0E8;font-size:0.9rem;margin-bottom:2px;"><strong>Ссылка для клиентов</strong></p><p style="color:#E8D5B0;font-size:0.82rem;font-style:italic;">Публичная ссылка из Telegram — делитесь ею в Instagram и TikTok</p></div>
           </div>
         </div>
         <div style="margin-top:8px;padding:12px;background:rgba(201,169,110,0.07);border-radius:8px;border-left:3px solid #C9A96E;">
@@ -568,6 +607,9 @@ async function initOwnerMode() {
   }
 
   async function uploadPhoto(file, photoType) {
+    const maxMb = photoType === 'avatar' ? 5 : 10;
+    if (!file.type.startsWith('image/')) { showToast('Можно загружать только изображения', false); return; }
+    if (file.size > maxMb * 1024 * 1024) { showToast(`Файл слишком большой (максимум ${maxMb} МБ)`, false); return; }
     showToast(photoType === 'avatar' ? 'Загружаем аватарку...' : 'Загружаем фото...');
     try {
       const res = await fetch('/api/upload-photo', {
@@ -694,7 +736,11 @@ async function initOwnerMode() {
           el.replaceWith(inp);
           inp.focus(); inp.select();
           const save = () => {
-            const val = inp.value.trim() || original;
+            let val = inp.value.trim() || original;
+            if (field === 'price' && !/\d/.test(val)) {
+              showToast('Цена должна содержать хотя бы одну цифру', false);
+              val = original;
+            }
             el.textContent = val;
             inp.replaceWith(el);
             const services = [...(masterData.services || [])];

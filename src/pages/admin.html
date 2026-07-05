@@ -165,9 +165,6 @@ async function loadMasters() {
       const tgLink = m.tgUsername
         ? `<a class="contact-link" href="https://t.me/${m.tgUsername}" target="_blank">TG</a>`
         : '';
-      const waLink = m.phone
-        ? `<a class="contact-link" href="https://wa.me/${m.phone.replace(/[^0-9]/g,'')}" target="_blank">WA</a>`
-        : '';
 
       const date = new Date(m.createdAt).toLocaleDateString('ru-RU');
 
@@ -189,7 +186,7 @@ async function loadMasters() {
         <td>
           <div class="contact-links">
             <a class="contact-link" href="/master/${m.slug}" target="_blank">Сайт</a>
-            ${tgLink}${waLink}
+            ${tgLink}
             <button class="contact-link" style="cursor:pointer;background:none;" onclick="extendSub('${m.slug}','${m.name}')">+1 мес</button>
           </div>
         </td>
