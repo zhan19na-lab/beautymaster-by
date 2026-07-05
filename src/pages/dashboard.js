@@ -5,6 +5,14 @@
 const DAY_KEYS   = ['mon','tue','wed','thu','fri','sat','sun'];
 const DAY_LABELS = ['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота','Воскресенье'];
 
+const DURATION_OPTIONS = [30, 60, 90, 120, 150, 180, 210, 240, 300, 360];
+function formatDuration(min) {
+  const h = Math.floor(min / 60), m = min % 60;
+  if (!h) return `${m} мин`;
+  if (!m) return `${h} ч`;
+  return `${h} ч ${m} мин`;
+}
+
 const params = new URLSearchParams(window.location.search);
 const slug   = params.get('slug');
 const token  = params.get('token');
@@ -56,7 +64,7 @@ function scheduleFromMaster(m) {
 }
 
 function servicesFromMaster(m) {
-  return (m.services || []).map((s, i) => ({ id: i + 1, name: s.name || '', price: s.price || '', desc: s.desc || '' }));
+  return (m.services || []).map((s, i) => ({ id: i + 1, name: s.name || '', price: s.price || '', desc: s.desc || '', duration: s.duration || 60 }));
 }
 
 function populateForm(m) {
@@ -300,6 +308,9 @@ function renderServices() {
     row.innerHTML = `
       <input type="text" class="form-input service-edit-name" value="${svc.name}" placeholder="Название услуги" />
       <input type="text" class="form-input service-edit-price" value="${svc.price}" placeholder="Цена (напр. от 30 BYN)" />
+      <select class="form-input service-edit-duration" title="Сколько времени занимает услуга">
+        ${DURATION_OPTIONS.map(min => `<option value="${min}" ${svc.duration === min ? 'selected' : ''}>${formatDuration(min)}</option>`).join('')}
+      </select>
       <button class="service-delete-btn" title="Удалить">✕</button>
     `;
     row.querySelector('.service-delete-btn').addEventListener('click', () => {
@@ -314,12 +325,16 @@ function renderServices() {
       const s = state.services.find(s => s.id === svc.id);
       if (s) s.price = e.target.value;
     });
+    row.querySelector('.service-edit-duration').addEventListener('change', (e) => {
+      const s = state.services.find(s => s.id === svc.id);
+      if (s) s.duration = parseInt(e.target.value, 10);
+    });
     editor.appendChild(row);
   });
 }
 
 document.getElementById('add-service-btn')?.addEventListener('click', () => {
-  state.services.push({ id: state.nextServiceId++, name: '', price: '', desc: '' });
+  state.services.push({ id: state.nextServiceId++, name: '', price: '', desc: '', duration: 60 });
   renderServices();
   const rows = document.querySelectorAll('.service-edit-row');
   const last = rows[rows.length - 1];
@@ -467,7 +482,7 @@ window.saveSection = async function(section) {
       if (!s.name.trim()) { showToast('У каждой услуги должно быть название', 'error'); return; }
       if (!/\d/.test(s.price)) { showToast(`Цена услуги «${s.name}» должна содержать хотя бы одну цифру`, 'error'); return; }
     }
-    const ok = await persist({ services: state.services.map(s => ({ name: s.name.trim(), price: s.price.trim(), desc: s.desc || '' })) });
+    const ok = await persist({ services: state.services.map(s => ({ name: s.name.trim(), price: s.price.trim(), desc: s.desc || '', duration: s.duration || 60 })) });
     if (!ok) return;
 
   } else if (section === 'schedule') {

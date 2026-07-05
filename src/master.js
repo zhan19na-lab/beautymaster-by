@@ -6,6 +6,16 @@ const MONTHS_RU = ['Январь','Февраль','Март','Апрель','М
 
 let masterData = null;
 
+/* ── Duration helpers ─── */
+function formatDuration(min) {
+  const h = Math.floor(min / 60), m = min % 60;
+  if (!h) return `${m} мин`;
+  if (!m) return `${h} ч`;
+  return `${h} ч ${m} мин`;
+}
+function timeToMinutes(t) { const [h, m] = t.split(':').map(Number); return h * 60 + m; }
+function minutesToTime(min) { const h = Math.floor(min / 60), m = min % 60; return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`; }
+
 /* ── Get slug from URL ─── */
 function getSlug() {
   const parts = window.location.pathname.split('/');
@@ -91,7 +101,7 @@ function renderPage(d) {
     <div class="service-row">
       <div class="service-info">
         <span class="service-name">${s.name}</span>
-        <span class="service-desc">${s.desc || ''}</span>
+        <span class="service-desc">${s.desc ? s.desc + ' · ' : ''}${formatDuration(s.duration || 60)}</span>
       </div>
       <span class="service-price">${s.price}</span>
       <a href="#booking" class="service-book-btn">Записаться</a>
@@ -102,10 +112,10 @@ function renderPage(d) {
   const bg = document.getElementById('booking-services');
   bg.innerHTML = services.map(s => `
     <label class="service-radio-card">
-      <input type="radio" name="service" value="${s.name} · ${s.price}" />
+      <input type="radio" name="service" value="${s.name} · ${s.price}" data-duration="${s.duration || 60}" />
       <div class="src-inner">
         <span class="src-name">${s.name}</span>
-        <span class="src-price">${s.price}</span>
+        <span class="src-price">${s.price} · ${formatDuration(s.duration || 60)}</span>
       </div>
     </label>
   `).join('');
@@ -237,16 +247,21 @@ function renderTimeSlots(date) {
   const dow = DOW_MAP[date.getDay()];
   const schedule = masterData?.schedule;
   const daySchedule = schedule?.[dow];
-  const bookedSlots = masterData?.bookedSlots || [];
+  const bookedRanges = masterData?.bookedSlots || [];
+  const duration = window.__bookingDuration || 60;
 
   const dateKey = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+  window.__bookingDateKey = dateKey;
 
+  const dayBookings = bookedRanges.filter(b => b.date === dateKey);
+
+  const STEP = 30; // minutes between selectable start times
   let slots = [];
   if (daySchedule?.enabled) {
-    const [fromH] = daySchedule.from.split(':').map(Number);
-    const [toH]   = daySchedule.to.split(':').map(Number);
-    for (let h = fromH; h < toH; h++) {
-      slots.push(`${String(h).padStart(2,'0')}:00`);
+    const dayStart = timeToMinutes(daySchedule.from);
+    const dayEnd   = timeToMinutes(daySchedule.to);
+    for (let start = dayStart; start + duration <= dayEnd; start += STEP) {
+      slots.push(start);
     }
   }
 
@@ -255,8 +270,10 @@ function renderTimeSlots(date) {
     return;
   }
 
-  container.innerHTML = slots.map(t => {
-    const isBooked = bookedSlots.includes(`${dateKey}-${t}`);
+  container.innerHTML = slots.map(startMin => {
+    const t = minutesToTime(startMin);
+    const endMin = startMin + duration;
+    const isBooked = dayBookings.some(b => timeToMinutes(b.start) < endMin && startMin < timeToMinutes(b.end));
     return `<button type="button" class="time-slot${isBooked ? ' time-slot--booked' : ''}" data-time="${t}" ${isBooked ? 'disabled' : ''}>${t}</button>`;
   }).join('');
 
@@ -310,7 +327,9 @@ window.bookingNext = function(fromStep) {
       h.textContent = 'Пожалуйста, выберите услугу';
       return;
     }
-    window.__bookingService = document.querySelector('[name="service"]:checked').value;
+    const checkedService = document.querySelector('[name="service"]:checked');
+    window.__bookingService = checkedService.value;
+    window.__bookingDuration = parseInt(checkedService.dataset.duration, 10) || 60;
   }
   if (fromStep === 2 && !window.__bookingDate) {
     shakeStep(2);
@@ -371,7 +390,9 @@ function initBookingForm() {
       type: 'booking', name, phone,
       service: window.__bookingService || '—',
       date: window.__bookingDate || '—',
+      dateKey: window.__bookingDateKey,
       time: window.__bookingTime || '—',
+      duration: window.__bookingDuration || 60,
       masterUsername: masterData?.tgUsername,
       masterSlug: getSlug()
     });

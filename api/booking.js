@@ -6,7 +6,13 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { type, name, phone, service, date, time, message, masterUsername, masterSlug } = req.body || {};
+  const { type, name, phone, service, date, time, message, masterUsername, masterSlug, dateKey, duration } = req.body || {};
+
+  function addMinutes(timeStr, mins) {
+    const [h, m] = timeStr.split(':').map(Number);
+    const total = ((h * 60 + m + mins) % (24 * 60) + 24 * 60) % (24 * 60);
+    return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
+  }
 
   function escapeHtml(v) {
     return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -96,6 +102,16 @@ export default async function handler(req, res) {
             createdAt: new Date().toISOString()
           });
           master.bookings = bookings;
+
+          // Block this time range so future clients can't double-book the slot
+          if (type === 'booking' && dateKey && time && time !== '—') {
+            if (!master.bookedSlots) master.bookedSlots = [];
+            master.bookedSlots.push({
+              date: dateKey,
+              start: time,
+              end: addMinutes(time, Number(duration) > 0 ? Number(duration) : 60)
+            });
+          }
           await fetch(`https://blob.vercel-storage.com/?pathname=${encodeURIComponent(`masters/${slug}/${Date.now()}.json`)}`, {
             method: 'PUT',
             headers: {

@@ -428,7 +428,7 @@ img { max-width: 100%; display: block; }
 .services-editor { display: flex; flex-direction: column; gap: 0; margin-bottom: 16px; }
 .service-edit-row {
   display: grid;
-  grid-template-columns: 1fr 160px 40px;
+  grid-template-columns: 1fr 140px 130px 40px;
   gap: 10px;
   align-items: center;
   padding: 12px 0;
@@ -438,6 +438,10 @@ img { max-width: 100%; display: block; }
 .service-edit-row:first-child { border-top: 1px solid rgba(255,255,255,0.04); }
 .service-edit-name { }
 .service-edit-price { }
+.service-edit-duration {
+  background: rgba(255,255,255,0.03);
+  cursor: pointer;
+}
 .service-delete-btn {
   width: 32px; height: 32px;
   display: flex;
@@ -654,7 +658,8 @@ img { max-width: 100%; display: block; }
   .sidebar.open { transform: translateX(0); box-shadow: 20px 0 60px rgba(0,0,0,0.8); }
   .mobile-topbar { display: flex; }
   .dash-main { margin-left: 0; padding-top: 80px; }
-  .service-edit-row { grid-template-columns: 1fr 120px 36px; }
+  .service-edit-row { grid-template-columns: 1fr; }
+  .service-edit-row .service-delete-btn { justify-self: end; }
   .schedule-day-row { grid-template-columns: 110px 1fr 1fr 32px; gap: 8px; }
   .form-row { grid-template-columns: 1fr; }
   .portfolio-grid-editor { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
