@@ -10,14 +10,16 @@ export default async function handler(req, res) {
 
   // List blobs with this slug prefix
   const listRes = await fetch(
-    `https://blob.vercel-storage.com/?prefix=masters/${slug}&limit=1`,
+    `https://blob.vercel-storage.com/?prefix=masters/${slug}&limit=100`,
     { headers: { Authorization: `Bearer ${token}` } }
   );
 
   if (!listRes.ok) return res.status(500).json({ error: 'Storage error' });
 
   const list = await listRes.json();
-const blob = list.blobs?.[0];
+  const exactPathname = `masters/${slug}.json`;
+  const matches = (list.blobs || []).filter(b => b.pathname === exactPathname);
+  const blob = matches.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))[0];
   if (!blob) return res.status(404).json({ error: 'Master not found' });
 
   const fetchUrl = blob.downloadUrl || blob.url;

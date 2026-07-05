@@ -14,12 +14,15 @@ export default async function handler(req, res) {
 
   // Verify token
   const listRes = await fetch(
-    `https://blob.vercel-storage.com/?prefix=masters/${slug}&limit=1`,
+    `https://blob.vercel-storage.com/?prefix=masters/${slug}&limit=100`,
     { headers: { Authorization: `Bearer ${blobToken}` } }
   );
   if (!listRes.ok) return res.status(500).json({ error: 'Storage error' });
   const list = await listRes.json();
-  const masterBlob = list.blobs?.[0];
+  const exactPathname = `masters/${slug}.json`;
+  const masterBlob = (list.blobs || [])
+    .filter(b => b.pathname === exactPathname)
+    .sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))[0];
   if (!masterBlob) return res.status(404).json({ error: 'Master not found' });
 
   const existingRes = await fetch(masterBlob.downloadUrl || masterBlob.url, {
@@ -32,11 +35,12 @@ export default async function handler(req, res) {
   const payload = { ...existing, ...data, editToken: existing.editToken, updatedAt: new Date().toISOString() };
   delete payload.token;
 
-  const r = await fetch(`https://blob.vercel-storage.com/${masterBlob.pathname}`, {
+  const r = await fetch(`https://blob.vercel-storage.com/?pathname=${encodeURIComponent(masterBlob.pathname)}`, {
     method: 'PUT',
     headers: {
       'Authorization': `Bearer ${blobToken}`,
       'content-type': 'application/json',
+      'x-api-version': '12',
       'x-add-random-suffix': '0',
       'x-allow-overwrite': '1',
       'x-vercel-blob-access': 'private'

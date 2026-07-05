@@ -76,11 +76,12 @@ export default async function handler(req, res) {
             createdAt: new Date().toISOString()
           });
           master.bookings = bookings;
-          await fetch(`https://blob.vercel-storage.com/masters/${slug}.json`, {
+          await fetch(`https://blob.vercel-storage.com/?pathname=${encodeURIComponent(`masters/${slug}.json`)}`, {
             method: 'PUT',
             headers: {
               Authorization: `Bearer ${blobToken}`,
               'content-type': 'application/json',
+              'x-api-version': '12',
               'x-add-random-suffix': '0',
               'x-allow-overwrite': '1',
               'x-vercel-blob-access': 'private'

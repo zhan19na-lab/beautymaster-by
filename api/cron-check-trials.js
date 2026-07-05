@@ -20,7 +20,17 @@ export default async function handler(req, res) {
   if (!listRes?.ok) return res.status(500).json({ error: 'Blob list failed' });
 
   const listData = await listRes.json();
-  const blobs = listData.blobs || [];
+  const allBlobs = listData.blobs || [];
+
+  // De-dupe: multiple blob versions can exist under the same pathname; keep only the newest per master
+  const newestByPathname = new Map();
+  for (const blob of allBlobs) {
+    const existing = newestByPathname.get(blob.pathname);
+    if (!existing || new Date(blob.uploadedAt) > new Date(existing.uploadedAt)) {
+      newestByPathname.set(blob.pathname, blob);
+    }
+  }
+  const blobs = [...newestByPathname.values()];
 
   const now = new Date();
   const notified = [];

@@ -16,11 +16,14 @@ export default async function handler(req, res) {
   if (!blobToken) return res.status(500).json({ error: 'No blob token' });
 
   try {
-    const listRes = await fetch(`https://blob.vercel-storage.com/?prefix=masters/${slug}&limit=1`, {
+    const listRes = await fetch(`https://blob.vercel-storage.com/?prefix=masters/${slug}&limit=100`, {
       headers: { Authorization: `Bearer ${blobToken}` }
     });
     const listData = await listRes.json();
-    const blob = listData.blobs?.[0];
+    const exactPathname = `masters/${slug}.json`;
+    const blob = (listData.blobs || [])
+      .filter(b => b.pathname === exactPathname)
+      .sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))[0];
     if (!blob) return res.status(404).json({ error: 'Master not found' });
 
     const masterRes = await fetch(blob.downloadUrl || blob.url, {
@@ -38,11 +41,12 @@ export default async function handler(req, res) {
     master.subscriptionExpiry = newExpiry.toISOString();
     master.isPaid = true;
 
-    await fetch(`https://blob.vercel-storage.com/masters/${slug}.json`, {
+    await fetch(`https://blob.vercel-storage.com/?pathname=${encodeURIComponent(`masters/${slug}.json`)}`, {
       method: 'PUT',
       headers: {
         Authorization: `Bearer ${blobToken}`,
         'content-type': 'application/json',
+        'x-api-version': '12',
         'x-add-random-suffix': '0',
         'x-allow-overwrite': '1',
         'x-vercel-blob-access': 'private'
