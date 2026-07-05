@@ -16,14 +16,24 @@ export default async function handler(req, res) {
   if (!blobToken) return res.status(500).json({ error: 'No blob token' });
 
   try {
-    const listRes = await fetch(`https://blob.vercel-storage.com/?prefix=masters/${slug}&limit=100`, {
+    const listRes = await fetch(`https://blob.vercel-storage.com/?prefix=masters/${slug}/&limit=100`, {
       headers: { Authorization: `Bearer ${blobToken}` }
     });
     const listData = await listRes.json();
-    const exactPathname = `masters/${slug}.json`;
-    const blob = (listData.blobs || [])
-      .filter(b => b.pathname === exactPathname)
-      .sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))[0];
+    const existingBlobs = (listData.blobs || []).sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+    let blob = existingBlobs[0];
+    let legacyBlob = null;
+
+    // Fall back to the old flat masters/{slug}.json layout for masters created before this scheme existed
+    if (!blob) {
+      const legacyRes = await fetch(
+        `https://blob.vercel-storage.com/?prefix=masters/${slug}.json&limit=1`,
+        { headers: { Authorization: `Bearer ${blobToken}` } }
+      );
+      const legacyList = await legacyRes.json().catch(() => ({}));
+      legacyBlob = legacyList.blobs?.[0];
+      blob = legacyBlob;
+    }
     if (!blob) return res.status(404).json({ error: 'Master not found' });
 
     const masterRes = await fetch(blob.downloadUrl || blob.url, {
@@ -41,18 +51,26 @@ export default async function handler(req, res) {
     master.subscriptionExpiry = newExpiry.toISOString();
     master.isPaid = true;
 
-    await fetch(`https://blob.vercel-storage.com/?pathname=${encodeURIComponent(`masters/${slug}.json`)}`, {
+    await fetch(`https://blob.vercel-storage.com/?pathname=${encodeURIComponent(`masters/${slug}/${Date.now()}.json`)}`, {
       method: 'PUT',
       headers: {
         Authorization: `Bearer ${blobToken}`,
         'content-type': 'application/json',
         'x-api-version': '12',
         'x-add-random-suffix': '0',
-        'x-allow-overwrite': '1',
         'x-vercel-blob-access': 'private'
       },
       body: JSON.stringify(master)
     });
+
+    const stale = existingBlobs.slice(2).concat(legacyBlob ? [legacyBlob] : []);
+    if (stale.length) {
+      fetch('https://blob.vercel-storage.com/delete', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${blobToken}`, 'content-type': 'application/json' },
+        body: JSON.stringify({ urls: stale.map(b => b.url) })
+      }).catch(() => {});
+    }
 
     // Notify admin in Telegram
     const token   = process.env.TELEGRAM_BOT_TOKEN;

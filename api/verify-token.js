@@ -9,13 +9,23 @@ export default async function handler(req, res) {
   if (!blobToken) return res.status(500).json({ valid: false });
 
   const listRes = await fetch(
-    `https://blob.vercel-storage.com/?prefix=masters/${slug}&limit=10&_=${Date.now()}`,
+    `https://blob.vercel-storage.com/?prefix=masters/${slug}/&limit=10&_=${Date.now()}`,
     { headers: { Authorization: `Bearer ${blobToken}`, 'Cache-Control': 'no-cache' } }
   );
   if (!listRes.ok) return res.status(500).json({ valid: false, step: 'list' });
 
   const list = await listRes.json();
-  const blobs = list.blobs || [];
+  let blobs = list.blobs || [];
+
+  // Fall back to the old flat masters/{slug}.json layout for masters created before this scheme existed
+  if (!blobs.length) {
+    const legacyRes = await fetch(
+      `https://blob.vercel-storage.com/?prefix=masters/${slug}.json&limit=1&_=${Date.now()}`,
+      { headers: { Authorization: `Bearer ${blobToken}`, 'Cache-Control': 'no-cache' } }
+    );
+    const legacyList = await legacyRes.json().catch(() => ({}));
+    blobs = legacyList.blobs || [];
+  }
   if (!blobs.length) return res.status(404).json({ valid: false, step: 'no-blob' });
 
   // Try each blob (newest first) until we find matching token

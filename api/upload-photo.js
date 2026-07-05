@@ -12,17 +12,27 @@ export default async function handler(req, res) {
 
   if (!slug || !token || !blobToken) return res.status(400).json({ error: 'Missing params' });
 
-  // Verify owner token
+  // Verify owner token — each save creates a new file under masters/{slug}/, pick the newest
   const listRes = await fetch(
-    `https://blob.vercel-storage.com/?prefix=masters/${slug}&limit=100`,
+    `https://blob.vercel-storage.com/?prefix=masters/${slug}/&limit=100`,
     { headers: { Authorization: `Bearer ${blobToken}` } }
   );
   if (!listRes.ok) return res.status(500).json({ error: 'Storage error' });
   const list = await listRes.json();
-  const exactPathname = `masters/${slug}.json`;
-  const masterBlob = (list.blobs || [])
-    .filter(b => b.pathname === exactPathname)
-    .sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))[0];
+  const existingBlobs = (list.blobs || []).sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+  let masterBlob = existingBlobs[0];
+  let legacyBlob = null;
+
+  // Fall back to the old flat masters/{slug}.json layout for masters created before this scheme existed
+  if (!masterBlob) {
+    const legacyRes = await fetch(
+      `https://blob.vercel-storage.com/?prefix=masters/${slug}.json&limit=1`,
+      { headers: { Authorization: `Bearer ${blobToken}` } }
+    );
+    const legacyList = await legacyRes.json().catch(() => ({}));
+    legacyBlob = legacyList.blobs?.[0];
+    masterBlob = legacyBlob;
+  }
   if (!masterBlob) return res.status(404).json({ error: 'Master not found' });
 
   const masterDataRes = await fetch(masterBlob.downloadUrl || masterBlob.url, {
@@ -52,9 +62,9 @@ export default async function handler(req, res) {
   if (!ext) return res.status(400).json({ error: 'Unsupported file type — only JPG, PNG, GIF, WEBP are allowed' });
   const contentType = ext === 'png' ? 'image/png' : ext === 'gif' ? 'image/gif' : ext === 'webp' ? 'image/webp' : 'image/jpeg';
 
-  // Upload photo to Blob
+  // Upload photo to Blob — always a fresh filename (avoids stale CDN cache on overwrite)
   const filename = photoType === 'avatar'
-    ? `photos/${slug}-avatar.${ext}`
+    ? `photos/${slug}-avatar-${Date.now()}.${ext}`
     : `photos/${slug}-portfolio-${Date.now()}.${ext}`;
 
   const uploadRes = await fetch(`https://blob.vercel-storage.com/?pathname=${encodeURIComponent(filename)}`, {
@@ -64,7 +74,6 @@ export default async function handler(req, res) {
       'content-type': contentType,
       'x-api-version': '12',
       'x-add-random-suffix': '0',
-      'x-allow-overwrite': '1',
       'x-vercel-blob-access': 'private'
     },
     body: buffer
@@ -79,6 +88,7 @@ export default async function handler(req, res) {
   const photoUrl = uploadData.url;
 
   // Update master profile
+  const oldAvatarUrl = photoType === 'avatar' ? masterData.photo : null;
   if (photoType === 'avatar') {
     masterData.photo = photoUrl;
   } else {
@@ -87,18 +97,35 @@ export default async function handler(req, res) {
   }
   masterData.updatedAt = new Date().toISOString();
 
-  await fetch(`https://blob.vercel-storage.com/?pathname=${encodeURIComponent(masterBlob.pathname)}`, {
+  await fetch(`https://blob.vercel-storage.com/?pathname=${encodeURIComponent(`masters/${slug}/${Date.now()}.json`)}`, {
     method: 'PUT',
     headers: {
       'Authorization': `Bearer ${blobToken}`,
       'content-type': 'application/json',
       'x-api-version': '12',
       'x-add-random-suffix': '0',
-      'x-allow-overwrite': '1',
       'x-vercel-blob-access': 'private'
     },
     body: JSON.stringify(masterData)
   });
+
+  // Best-effort cleanup: keep only the 3 most recent profile versions, drop the replaced avatar
+  // file, and drop the legacy flat file once migrated to the new folder layout
+  const stale = existingBlobs.slice(2).concat(legacyBlob ? [legacyBlob] : []);
+  if (stale.length) {
+    fetch('https://blob.vercel-storage.com/delete', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${blobToken}`, 'content-type': 'application/json' },
+      body: JSON.stringify({ urls: stale.map(b => b.url) })
+    }).catch(() => {});
+  }
+  if (oldAvatarUrl && oldAvatarUrl !== photoUrl) {
+    fetch('https://blob.vercel-storage.com/delete', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${blobToken}`, 'content-type': 'application/json' },
+      body: JSON.stringify({ urls: [oldAvatarUrl] })
+    }).catch(() => {});
+  }
 
   return res.status(200).json({ success: true, url: photoUrl });
 }

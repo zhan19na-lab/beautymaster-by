@@ -116,6 +116,15 @@ export default async function handler(req, res) {
 
   if (!blobToken) return res.status(500).json({ error: 'Storage not configured' });
 
+  // Reject if this slug already has a master (folder-per-master storage scheme)
+  const existingListRes = await fetch(`https://blob.vercel-storage.com/?prefix=masters/${slug}/&limit=1`, {
+    headers: { Authorization: `Bearer ${blobToken}` }
+  });
+  const existingList = await existingListRes.json().catch(() => ({}));
+  if (existingList.blobs?.length) {
+    return res.status(409).json({ error: 'A master with this name already exists, please try a different name' });
+  }
+
   // Create master page in Blob storage
   let saved = false;
   {
@@ -138,7 +147,7 @@ export default async function handler(req, res) {
       createdAt: new Date().toISOString()
     };
 
-    const putRes = await fetch(`https://blob.vercel-storage.com/?pathname=${encodeURIComponent(`masters/${slug}.json`)}`, {
+    const putRes = await fetch(`https://blob.vercel-storage.com/?pathname=${encodeURIComponent(`masters/${slug}/${Date.now()}.json`)}`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${blobToken}`,

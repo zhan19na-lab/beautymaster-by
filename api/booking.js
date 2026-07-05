@@ -60,10 +60,16 @@ export default async function handler(req, res) {
     if (blobToken && masterUsername) {
       const slug = masterUsername.replace('@','').toLowerCase();
       try {
-        const masterRes = await fetch(`https://blob.vercel-storage.com/masters/${slug}.json`, {
+        const listRes = await fetch(`https://blob.vercel-storage.com/?prefix=masters/${slug}/&limit=100`, {
           headers: { Authorization: `Bearer ${blobToken}` }
         });
-        if (masterRes.ok) {
+        const list = await listRes.json();
+        const existingBlobs = (list.blobs || []).sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt));
+        const masterBlob = existingBlobs[0];
+        if (masterBlob) {
+          const masterRes = await fetch(masterBlob.downloadUrl || masterBlob.url, {
+            headers: { Authorization: `Bearer ${blobToken}` }
+          });
           const master = await masterRes.json();
           const bookings = master.bookings || [];
           bookings.push({
@@ -76,18 +82,25 @@ export default async function handler(req, res) {
             createdAt: new Date().toISOString()
           });
           master.bookings = bookings;
-          await fetch(`https://blob.vercel-storage.com/?pathname=${encodeURIComponent(`masters/${slug}.json`)}`, {
+          await fetch(`https://blob.vercel-storage.com/?pathname=${encodeURIComponent(`masters/${slug}/${Date.now()}.json`)}`, {
             method: 'PUT',
             headers: {
               Authorization: `Bearer ${blobToken}`,
               'content-type': 'application/json',
               'x-api-version': '12',
               'x-add-random-suffix': '0',
-              'x-allow-overwrite': '1',
               'x-vercel-blob-access': 'private'
             },
             body: JSON.stringify(master)
           });
+          const stale = existingBlobs.slice(2);
+          if (stale.length) {
+            fetch('https://blob.vercel-storage.com/delete', {
+              method: 'POST',
+              headers: { Authorization: `Bearer ${blobToken}`, 'content-type': 'application/json' },
+              body: JSON.stringify({ urls: stale.map(b => b.url) })
+            }).catch(() => {});
+          }
         }
       } catch { /* non-critical */ }
     }

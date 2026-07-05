@@ -8,18 +8,27 @@ export default async function handler(req, res) {
   const token = process.env.BLOB_READ_WRITE_TOKEN;
   if (!token) return res.status(500).json({ error: 'Storage not configured' });
 
-  // List blobs with this slug prefix
+  // Each save creates a new file under masters/{slug}/ instead of overwriting one —
+  // avoids Vercel Blob's CDN caching stale content at a reused URL. Pick the newest.
   const listRes = await fetch(
-    `https://blob.vercel-storage.com/?prefix=masters/${slug}&limit=100`,
+    `https://blob.vercel-storage.com/?prefix=masters/${slug}/&limit=100`,
     { headers: { Authorization: `Bearer ${token}` } }
   );
 
   if (!listRes.ok) return res.status(500).json({ error: 'Storage error' });
 
   const list = await listRes.json();
-  const exactPathname = `masters/${slug}.json`;
-  const matches = (list.blobs || []).filter(b => b.pathname === exactPathname);
-  const blob = matches.sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))[0];
+  let blob = (list.blobs || []).sort((a, b) => new Date(b.uploadedAt) - new Date(a.uploadedAt))[0];
+
+  // Fall back to the old flat masters/{slug}.json layout for masters created before this scheme existed
+  if (!blob) {
+    const legacyRes = await fetch(
+      `https://blob.vercel-storage.com/?prefix=masters/${slug}.json&limit=1`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    const legacyList = await legacyRes.json().catch(() => ({}));
+    blob = legacyList.blobs?.[0];
+  }
   if (!blob) return res.status(404).json({ error: 'Master not found' });
 
   const fetchUrl = blob.downloadUrl || blob.url;

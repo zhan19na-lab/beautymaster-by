@@ -21,15 +21,16 @@ export default async function handler(req, res) {
     const listData = await listRes.json();
     const allBlobs = listData.blobs || [];
 
-    // De-dupe: multiple blob versions can exist under the same pathname; keep only the newest per master
-    const newestByPathname = new Map();
+    // Each master lives under masters/{slug}/{timestamp}.json — keep only the newest file per slug
+    const newestBySlug = new Map();
     for (const blob of allBlobs) {
-      const existing = newestByPathname.get(blob.pathname);
+      const slugKey = blob.pathname.split('/')[1];
+      const existing = newestBySlug.get(slugKey);
       if (!existing || new Date(blob.uploadedAt) > new Date(existing.uploadedAt)) {
-        newestByPathname.set(blob.pathname, blob);
+        newestBySlug.set(slugKey, blob);
       }
     }
-    const blobs = [...newestByPathname.values()];
+    const blobs = [...newestBySlug.values()];
 
     const masters = await Promise.all(blobs.map(async blob => {
       try {
