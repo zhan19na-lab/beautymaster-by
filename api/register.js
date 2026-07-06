@@ -175,7 +175,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         chat_id: adminId,
         text: isVip
-          ? `${vipHeader}👤 <b>Имя:</b> ${name}\n💅 <b>Направление:</b> ${direction}\n📞 <b>Контакт:</b> ${contact}${tgInfo}\n\n📋 <b>Анкета:</b> https://beautymaster-by.vercel.app/anketa?slug=${slug}\n🔗 <b>Страница:</b> ${pageUrl}`
+          ? `${vipHeader}👤 <b>Имя:</b> ${name}\n💅 <b>Направление:</b> ${direction}\n📞 <b>Контакт:</b> ${contact}${tgInfo}\n\n🔗 <b>Страница для редактирования:</b> ${editUrl}`
           : `${vipHeader}👤 <b>Имя:</b> ${name}\n💅 <b>Направление:</b> ${direction}\n📞 <b>Контакт:</b> ${contact}${tgInfo}\n\n🔗 <b>Страница:</b> ${pageUrl}`,
         parse_mode: 'HTML',
         disable_web_page_preview: true
