@@ -290,10 +290,29 @@ function isValidName(val) {
 /* ── Copy reg links ───────────────────────────────────────── */
 function copyRegLink(type) {
   const url = type === 'edit' ? window._regEditUrl : window._regPubUrl;
-  if (!url) return;
-  navigator.clipboard.writeText(url).then(() => {
-    alert('Ссылка скопирована!');
-  });
+  if (!url) { alert('Ссылка недоступна — обновите страницу и попробуйте снова.'); return; }
+
+  function fallbackCopy() {
+    const ta = document.createElement('textarea');
+    ta.value = url;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    let ok = false;
+    try { ok = document.execCommand('copy'); } catch {}
+    document.body.removeChild(ta);
+    alert(ok ? 'Ссылка скопирована!' : 'Не удалось скопировать. Выделите и скопируйте ссылку вручную.');
+  }
+
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(url).then(() => {
+      alert('Ссылка скопирована!');
+    }).catch(fallbackCopy);
+  } else {
+    fallbackCopy();
+  }
 }
 
 /* ── VIP offer button ─────────────────────────────────────── */
